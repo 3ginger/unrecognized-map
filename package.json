@@ -1,26 +1,27 @@
 {
-  "name": "headleg",
-  "version": "0.0.0",
-  "description": "Game about fun centipedas and mushrooms",
-  "main": "Gruntfile.js",
-  "devDependencies": {
-    "grunt-contrib-clean": "^0.5.0",
-    "grunt-contrib-concat": "^0.4.0",
-    "grunt-contrib-coffee": "^0.10.1",
-    "grunt-newer": "^0.7.0",
-    "grunt-contrib-uglify": "^0.4.0",
-    "grunt-contrib-stylus": "^0.14.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt": "^0.4.4",
-    "grunt-contrib-cssmin": "^0.9.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@gitlab.rambler.ru:ig/std-info-tpl.git"
-  },
-  "author": "",
-  "license": "ISC"
+    "name": "template-std-info",
+    "version": "0.0.2",
+    "description": "Inforgaphic template",
+    "main": "Gruntfile.js",
+    "devDependencies": {
+        "grunt-contrib-clean": "^0.5.0",
+        "grunt-contrib-concat": "^0.4.0",
+        "grunt-contrib-coffee": "^0.10.1",
+        "grunt-newer": "^0.7.0",
+        "grunt-contrib-uglify": "^0.4.0",
+        "grunt-contrib-stylus": "^0.14.0",
+        "grunt-contrib-watch": "^0.6.1",
+        "grunt": "^0.4.4",
+        "grunt-contrib-cssmin": "^0.9.0",
+        "grunt-autoprefixer": "^0.7.3"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@gitlab.rambler.ru:ig/std-info-tpl.git"
+    },
+    "author": "",
+    "license": "ISC"
 }
