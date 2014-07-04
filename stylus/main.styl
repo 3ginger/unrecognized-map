@@ -1,3 +1,67 @@
-body
-	margin 0
-	padding 0
+/*colors scheme*/
+main-c = #CCC
+fade-c = #333
+
+#ig
+  position: absolute
+  left: 0
+  top: 0
+  .social-btns
+    position absolute
+    bottom 20px
+    left: 50%
+    .wrapper
+      left -50%
+    .social
+      display inline-block
+      vertical-align top
+      margin-right 20px
+      &:last-child
+        margin-right 0
+  .btn
+    cursor pointer
+    &.social
+      size-btn = 50px
+      width: size-btn
+      height: size-btn
+      background-color fade-c
+      &.rounded
+        border-radius 5px
+    &#full-screen
+      &.default
+        width: 100px
+        height: 50px
+        background-color fade-c
+        position: absolute
+        bottom: 20px
+        right: 20px
+  html.full-screen &
+    background-color fade-c
+    width: 100%
+    height: 100%
+  .content
+    background-color main-c
+    position absolute
+    left: 0
+    top: 0
+    html.full-screen &
+      transform scale(1)
+      transform-origin 0 0
+
+/*browser settings*/
+html
+  &.desktop-device
+    .debug-panel
+      display none
+  &.no-svg
+  &.no-canvas
+    #browsehappy
+      display block
+    #ig
+      display none
+  &.svg
+  &.canvas
+    #browsehappy
+      display none
+    #ig
+      display block

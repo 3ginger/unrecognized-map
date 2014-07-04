@@ -1,19 +1,44 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Infographic Template</title>
-	<link rel="stylesheet" href="dist/main.min.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Infographic Template</title>
+    <meta name="description" content="Infographic Template">
+    <meta name="author" content="German Gurov">
+    <meta name="type" content="infographic">
+
+    <!--Settings for Facebook-->
+    <meta property="og:title" content=""/>
+    <meta property="og:description" content=""/>
+    <meta property="og:url" content="" />
+    <meta property="og:image" content=""/>
+
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+    <link rel="stylesheet" href="dist/main.min.css">
 </head>
 <body>
-	<div class="content"></div>
+	<div id="ig">
+        <div class="content">
+            <div id="full-screen" class="btn default"></div>
+            <div class="social-btns">
+                <div class="wrapper">
+                    <div id="vk" class="social btn"></div><div id="fb" class="social btn"></div><div id="t" class="social btn"></div>
+                </div>
+            </div>
+        </div>
+	</div>
+    <p id="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <div class="debug-panel"></div>
 
     <!--Developer script-->
-    <!--
-    <script src="bower_components/d3/d3.js"></script>
-    <script src="bower_components/underscore/underscore.js"></script>
-    <script src="js/main.js"></script>
-    -->
-	<script src="dist/main.min.js"></script>
+    <script src="components/modernizr/modernizr.js"></script>
+    <script src="components/underscore/underscore.js"></script>
+    <script src="components/d3/d3.js"></script>
+    <script src="js/components/support.js"></script>
+    <script src="js/user/main.js"></script>
+
+    <!--Production script-->
+	<!--<script src="dist/main.min.js"></script>-->
 </body>
 </html>
