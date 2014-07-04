@@ -6,8 +6,8 @@ module.exports = {
     },
     bower:{
         files:{
-            'components/underscore/underscore.min.js': 'components/underscore/underscore.js',
-            'components/modernizr/modernizr.min.js': 'components/modernizr/modernizr.js'
+            'bower/underscore/underscore.min.js': 'bower/underscore/underscore.js',
+            'bower/modernizr/modernizr.min.js': 'bower/modernizr/modernizr.js'
         }
     }
 };

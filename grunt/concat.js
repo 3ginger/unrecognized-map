@@ -16,10 +16,10 @@ module.exports = {
         },
         files: {
             'dist/main.min.js': [
-                'components/modernizr/modernizr.min.js',
-                'components/underscore/underscore.min.js',
-                'components/d3/d3.min.js',
-                //'components/jquery/dist/jquery.min.js',
+                'bower/modernizr/modernizr.min.js',
+                'bower/underscore/underscore.min.js',
+                'bower/d3/d3.min.js',
+                //'bower/jquery/dist/jquery.min.js',
                 'tmp/user.min.js'
             ]
         }
