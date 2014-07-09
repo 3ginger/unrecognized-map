@@ -122,10 +122,10 @@
             word = word.replace(/[,;:!?()"]/g, '').replace(/<.*?>/gi, '').toLowerCase();
             var space = "";
 
-            if (g3.POST_EXCUSES.filter(function(val) { return val == word; }).length > 0) {
+            if (_.indexOf(g3.POST_EXCUSES, word) != -1) {
                 text += words[i];
                 space = "\u00A0";
-            } else if(g3.PREV_EXCUSES.filter(function(val) { return val == word; }).length > 0) {
+            } else if(_.indexOf(g3.PREV_EXCUSES, word) != -1) {
                 text = text.substr(0, text.length - 1) + "\u00A0" + words[i];
                 space = " ";
             } else {
@@ -136,7 +136,6 @@
                 text += space;
             }
         });
-        console.log(text);
         el.innerHTML = text;
     };
 
@@ -284,48 +283,52 @@
     g3.initParallax = function(settings) {
         var keyFrames = settings.keyFrames || [];
         var frameRate = settings.frameRate || 60;
+        var mobileFrameRate = settings.mobileFrameRate || frameRate;
 
         var views = [], allView = null, currentKeyFrame = 0, inited = false;
         var scrollTop = 0, relativeScrollTop = 0, curKeyFrameTimeY = 0, windowHeight = 0, windowWidth = 0, bodyHeight = 1, scrollDirect = true;
         var checkTouchMove = false, lastTouchPoint = 0, touchScrollTop = 0;
+        var intProperties = ['x', 'y', 'rotate', 'left', 'right', 'top', 'bottom'], stringProperties = ['display'];
 
         //init
         g3.addClass(g3.html, "parallax");
         if(keyFrames.length > 0) {
             window.addEventListener('resize', setupValues);
             setupValues();
-            setInterval(updatePage, 1000/frameRate);
+            setInterval(updatePage, 1000/(isMobile ? mobileFrameRate : frameRate));
             changeKeyFrame(0);
             inited = true;
         }
 
         //touch
-        document.addEventListener("touchstart", function (e) {
-            if (e.touches.length == 1) {
+        if(isMobile) {
+            document.addEventListener("touchstart", function (e) {
+                if (e.touches.length == 1) {
+                    var touch = e.touches[0];
+                    lastTouchPoint = touch.pageY;
+                    checkTouchMove = true;
+                }
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+            document.addEventListener("touchend touchleave", function (e) {
                 var touch = e.touches[0];
-                lastTouchPoint = touch.pageY;
-                checkTouchMove = true;
-            }
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        });
-        document.addEventListener("touchend touchleave", function (e) {
-            var touch = e.touches[0];
-            lastTouchPoint = 0;
-            checkTouchMove = false;
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        });
-        document.addEventListener("touchmove", function (e) {
-            if(checkTouchMove) {
-                var touch = e.touches[0];
-                touchScrollTop += (lastTouchPoint - touch.pageY);
-                touchScrollTop = touchScrollTop < 0 ? 0 : touchScrollTop >= bodyHeight ? bodyHeight :touchScrollTop;
-                lastTouchPoint = touch.pageY;
-            }
-        });
+                lastTouchPoint = 0;
+                checkTouchMove = false;
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+            document.addEventListener("touchmove", function (e) {
+                if(checkTouchMove) {
+                    var touch = e.touches[0];
+                    touchScrollTop += (lastTouchPoint - touch.pageY);
+                    touchScrollTop = touchScrollTop < 0 ? 0 : touchScrollTop >= bodyHeight ? bodyHeight :touchScrollTop;
+                    lastTouchPoint = touch.pageY;
+                }
+            });
+        }
 
         function setupValues() {
             var lastProgress = scrollTop/bodyHeight;
@@ -381,25 +384,34 @@
                     });
 
                     if(property == "classes") {
-                        var action = beginVal != null && endVal != null;
-                        if(action) {
-                            _.each(endVal.split(" "), function(className) {
-                                obj.$obj.addClass(className);
+                        _.each(obj.phasesValues[property], function(seq, className) {
+                            var action = null;
+                            var stopSearch = false;
+                            _.each(seq, function(d) {
+                                if(!stopSearch) {
+                                    if (relativeScrollTop >= d.id) {
+                                        action = d.val;
+                                    }
+                                    if (relativeScrollTop < d.id) {
+                                        stopSearch = true;
+                                        if (action == 'add') {
+                                            _.each(obj.$obj, function (el) {
+                                                g3.addClass(el, className);
+                                            });
+                                        } else if (action == 'remove') {
+                                            _.each(obj.$obj, function (el) {
+                                                g3.removeClass(el, className);
+                                            });
+                                        }
+                                    }
+                                }
                             });
-                        } else if(beginVal == null) {
-                            _.each(values[0].val.split(" "), function(className) {
-                                obj.$obj.removeClass(className);
-                            });
-                        } else if(endVal == null) {
-                            _.each(values[values.length - 1].val.split(" "), function(className) {
-                                obj.$obj.removeClass(className);
-                            });
-                        }
+                        });
                     } else {
                         var currentValue = null;
                         if(beginVal != null && endVal != null) {
                             var distanceValue = (endVal - beginVal);
-                            currentValue = beginVal + (relativeScrollTop - beginId)/(endId - beginId)*distanceValue;  //easeInOutQuad(relativeScrollTop, beginVal, endVal - beginVal, keyFrames[currentKeyFrame].timeY);
+                            currentValue = beginVal + (relativeScrollTop - beginId)/(endId - beginId)*distanceValue;
                         } else if(beginVal == null) {
                             currentValue = values[0].val;
                         } else if(endVal == null) {
@@ -425,10 +437,10 @@
                     }
                 });
 
-                translateProperty = translateProperty.replace(new RegExp("-x"), '0');
-                translateProperty = translateProperty.replace(new RegExp("-y"), '0');
-                translateProperty = translateProperty.replace(new RegExp("-scale"), '1');
-                translateProperty = translateProperty.replace(new RegExp("-rotate"), '0');
+                translateProperty = translateProperty.replace("-x", '0');
+                translateProperty = translateProperty.replace("-y", '0');
+                translateProperty = translateProperty.replace("-scale", '1');
+                translateProperty = translateProperty.replace("-rotate", '0');
                 setProperties["-webkit-transform"] = translateProperty;
                 setProperties["-moz-transform"] = translateProperty;
                 setProperties["-ms-transform"] = translateProperty;
@@ -482,10 +494,9 @@
                 }
                 d.offsetTimeY = bodyHeight;
                 bodyHeight += d.timeY = convertPercentToPx(d.time, 'y');
-                console.log(d);
                 _.each(d.objects, function(obj) {
                     obj.$obj = document.querySelectorAll(obj.id);
-                    obj.phasesValues = {};
+                    obj.phasesValues = {classes:{}};
                     _.each(obj.phases, function(phase) {
                         _.each(obj.keys, function(key){
                             if(phase[key] != undefined) {
@@ -494,7 +505,28 @@
                                     obj.phasesValues[key] = [];
                                 }
                                 property = obj.phasesValues[key];
-                                property.push({id:convertPercentToPx(phase.id, "y", d.timeY), val:key == "classes" ? phase[key] : convertPercentToPx(phase[key], "y", d.timeY)});
+
+                                if(key == "classes") {
+                                    _.each(phase[key].split(" "), function(className, i) {
+                                        var classProperty = null;
+                                        if(!property[className]) {
+                                            property[className] = [];
+                                        }
+                                        classProperty = property[className];
+                                        if(classProperty.length == 0) {
+                                            classProperty.push({id:0, val:'remove'});
+                                            classProperty.push({id:convertPercentToPx("100%", "y", d.timeY), val:'remove'});
+                                        }
+                                        var lastVal = classProperty[classProperty.length - 2].val;
+                                        classProperty.splice(classProperty.length - 1, 0, {id:convertPercentToPx(phase.id, "y", d.timeY), val:lastVal == 'add' ? 'remove' : 'add'});
+                                    });
+                                } else {
+                                    var nextVal = convertPercentToPx(phase[key], "y", d.timeY);
+                                    if(_.indexOf(intProperties, key)) {
+                                        nextVal = parseInt(nextVal);
+                                    }
+                                    property.push({id:convertPercentToPx(phase.id, "y", d.timeY), val:nextVal});
+                                }
                             }
                         });
                     });
@@ -512,11 +544,9 @@
 
         function changeKeyFrame(frame) {
             currentKeyFrame = frame;
-            console.log(allView);
             _.each(allView, function(el) {
                 el.style.display = 'none';
             });
-            console.log(views[currentKeyFrame]);
             _.each(views[currentKeyFrame], function(el) {
                 el.style.display = 'block';
             });
