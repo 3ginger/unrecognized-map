@@ -51,6 +51,7 @@
 (new function() {
     window.g3 = this;
     g3.html = document.getElementsByTagName("html")[0];
+    g3.body = document.getElementsByTagName("body")[0];
 
     g3.browser_info = (function() {
         var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
@@ -98,10 +99,50 @@
             return false;
         });
     };
+    g3.getWindowWidth = function() {
+        return window.innerWidth || document.documentElement.clientWidth || g3.body.clientWidth;
+    };
+    g3.getWindowHeight = function() {
+        return window.innerHeight|| document.documentElement.clientHeight|| g3.body.clientHeight;
+    };
+    g3.setStyle = function ( el, propertyObject ) {
+        _.each(propertyObject, function(val, key) {
+            el.style[key] = val;
+        });
+    };
+
+    g3.POST_EXCUSES = ["без", "безо", "близ", "в", "во", "вместо", "вне", "для", "до", "за", "из", "изо", "из-за", "из-под", "к", "ко", "кроме", "между", "меж", "на", "над", "надо", "о", "об", "обо", "от", "ото", "перед", "передо", "пред", "предо", "по", "под", "подо", "при", "про", "ради", "с", "со", "сквозь", "среди", "у", "через", "чрез", "так", "и", "да", "не", "но", "также", "тоже", "ни", "зато", "однако", "же", "или", "либо", "то", "ли", "а", "я", "он"];
+    g3.PREV_EXCUSES = ["века", "в.", "год", "г.", "года"];
+
+    g3.carryUnionsHTML = function(el, text) {
+        var words = (text || el.innerHTML).replace(/ +(?= )/g,'').replace(/></g, "> <").split(" ");
+        text = '';
+
+        _.each(words, function(word, i) {
+            word = word.replace(/[,;:!?()"]/g, '').replace(/<.*?>/gi, '').toLowerCase();
+            var space = "";
+
+            if (g3.POST_EXCUSES.filter(function(val) { return val == word; }).length > 0) {
+                text += words[i];
+                space = "\u00A0";
+            } else if(g3.PREV_EXCUSES.filter(function(val) { return val == word; }).length > 0) {
+                text = text.substr(0, text.length - 1) + "\u00A0" + words[i];
+                space = " ";
+            } else {
+                text += words[i];
+                space = " ";
+            }
+            if(i < (words.length - 1)) {
+                text += space;
+            }
+        });
+        console.log(text);
+        el.innerHTML = text;
+    };
 
     g3.initContent = function(settings) {
-        g3.contentWidth = settings.contentWidth || 800;
-        g3.contentHeight = settings.contentHeight || 600;
+        g3.contentWidth = settings.contentWidth;
+        g3.contentHeight = settings.contentHeight;
         g3.curZoom = 1;
         g3.curWidth = g3.contentWidth;
         g3.curHeight = g3.contentHeight;
@@ -111,8 +152,12 @@
         g3.ig = document.getElementById("ig");
         g3.content = document.querySelectorAll("#ig > .content")[0];
 
-        g3.content.style.width = g3.ig.style.width = g3.contentWidth + "px";
-        g3.content.style.height = g3.ig.style.height = g3.contentHeight + "px";
+        if(settings.contentWidth) {
+            g3.content.style.width = g3.ig.style.width = g3.contentWidth + "px";
+        }
+        if(settings.contentHeight) {
+            g3.content.style.height = g3.ig.style.height = g3.contentHeight + "px";
+        }
     };
 }());
 //Add classes with browser info in html tag
@@ -127,7 +172,6 @@
     g3.MOBILE_EVENTS = ["tap", "touchstart", "touchend", "touchmove", "touchenter", "touchleave", "touchcancel"];
     g3.DESKTOP_EVENTS = ["click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave"];
 
-    //Проверяем является ли устройство мобильным
     g3.initMobile = function() {
         window.isMobile = ('ontouchstart' in window);
 
@@ -149,9 +193,6 @@
     g3.initFullScreen = function(parentId) {
         g3.igFrame = window.parent.document.getElementById(parentId);
         var fsBtn = document.getElementById("full-screen");
-
-        g3.ig.style.width = "100%";
-        g3.ig.style.height = "100%";
 
         g3.addClass(g3.html, "full-screen");
         window.addEventListener("resize", resize);
@@ -236,5 +277,265 @@
         document.getElementById("t").addEventListener("click", function() {
             window.open(g3.tUrl, 'sharer', 'toolbar=0,status=0,width=626,height=436');
         });
+    };
+}());
+//parallax
+(new function () {
+    g3.initParallax = function(settings) {
+        var keyFrames = settings.keyFrames || [];
+        var frameRate = settings.frameRate || 60;
+
+        var views = [], allView = null, currentKeyFrame = 0, inited = false;
+        var scrollTop = 0, relativeScrollTop = 0, curKeyFrameTimeY = 0, windowHeight = 0, windowWidth = 0, bodyHeight = 1, scrollDirect = true;
+        var checkTouchMove = false, lastTouchPoint = 0, touchScrollTop = 0;
+
+        //init
+        g3.addClass(g3.html, "parallax");
+        if(keyFrames.length > 0) {
+            window.addEventListener('resize', setupValues);
+            setupValues();
+            setInterval(updatePage, 1000/frameRate);
+            changeKeyFrame(0);
+            inited = true;
+        }
+
+        //touch
+        document.addEventListener("touchstart", function (e) {
+            if (e.touches.length == 1) {
+                var touch = e.touches[0];
+                lastTouchPoint = touch.pageY;
+                checkTouchMove = true;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+        document.addEventListener("touchend touchleave", function (e) {
+            var touch = e.touches[0];
+            lastTouchPoint = 0;
+            checkTouchMove = false;
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+        document.addEventListener("touchmove", function (e) {
+            if(checkTouchMove) {
+                var touch = e.touches[0];
+                touchScrollTop += (lastTouchPoint - touch.pageY);
+                touchScrollTop = touchScrollTop < 0 ? 0 : touchScrollTop >= bodyHeight ? bodyHeight :touchScrollTop;
+                lastTouchPoint = touch.pageY;
+            }
+        });
+
+        function setupValues() {
+            var lastProgress = scrollTop/bodyHeight;
+            bodyHeight = 0;
+            currentKeyFrame = 0;
+            curKeyFrameTimeY = 0;
+            relativeScrollTop = 0;
+
+            windowWidth = g3.getWindowWidth();
+            windowHeight = g3.getWindowHeight();
+
+            formatProperties();
+            scrollTop = parseInt(lastProgress * bodyHeight);
+
+            g3.body.style.height = bodyHeight + "px";
+            window.scrollTo(0, scrollTop);
+            calculateKeyFrame();
+        }
+
+        function updatePage() {
+            window.requestAnimationFrame(function() {
+                scrollContent();
+                if(scrollTop >= 0 && scrollTop <= (bodyHeight - windowHeight)) {
+                    calculateKeyFrame();
+                    animateElements();
+                }
+            });
+        }
+
+        function scrollContent() {
+            var nextScroll = isMobile ? touchScrollTop : window.pageYOffset;
+            scrollDirect = (nextScroll >= scrollTop);
+            scrollTop = nextScroll;
+            relativeScrollTop = scrollTop - curKeyFrameTimeY;
+        }
+
+        function animateElements() {
+            _.each(keyFrames[currentKeyFrame].objects, function(obj) {
+                var newProperties = {};
+                _.each(obj.phasesValues, function(values, property) {
+                    var beginVal = null;
+                    var endVal = null;
+                    var beginId = null;
+                    var endId = null;
+                    _.each(values, function(d) {
+                        if(endVal == null && relativeScrollTop >= d.id) {
+                            beginVal = d.val;
+                            beginId = d.id;
+                        } else if(beginVal != null && endVal == null && relativeScrollTop < d.id) {
+                            endVal = d.val;
+                            endId = d.id;
+                        }
+                    });
+
+                    if(property == "classes") {
+                        var action = beginVal != null && endVal != null;
+                        if(action) {
+                            _.each(endVal.split(" "), function(className) {
+                                obj.$obj.addClass(className);
+                            });
+                        } else if(beginVal == null) {
+                            _.each(values[0].val.split(" "), function(className) {
+                                obj.$obj.removeClass(className);
+                            });
+                        } else if(endVal == null) {
+                            _.each(values[values.length - 1].val.split(" "), function(className) {
+                                obj.$obj.removeClass(className);
+                            });
+                        }
+                    } else {
+                        var currentValue = null;
+                        if(beginVal != null && endVal != null) {
+                            var distanceValue = (endVal - beginVal);
+                            currentValue = beginVal + (relativeScrollTop - beginId)/(endId - beginId)*distanceValue;  //easeInOutQuad(relativeScrollTop, beginVal, endVal - beginVal, keyFrames[currentKeyFrame].timeY);
+                        } else if(beginVal == null) {
+                            currentValue = values[0].val;
+                        } else if(endVal == null) {
+                            currentValue = values[values.length - 1].val;
+                        }
+                        newProperties[property] = currentValue;
+                    }
+                });
+
+                var translateProperty = "translate(-xpx,-ypx) scale(-scale) rotate(-rotatedeg)";
+                var setProperties = {};
+                _.each(newProperties, function(d, k) {
+                    if(k == "x") {
+                        translateProperty = translateProperty.replace(new RegExp("-x"), parseInt(d));
+                    } else if(k == "y") {
+                        translateProperty = translateProperty.replace(new RegExp("-y"), parseInt(d));
+                    } else if(k == "scale") {
+                        translateProperty = translateProperty.replace(new RegExp("-scale"), d);
+                    } else if(k == "rotate") {
+                        translateProperty = translateProperty.replace(new RegExp("-rotate"), d);
+                    } else {
+                        setProperties[k] = d;
+                    }
+                });
+
+                translateProperty = translateProperty.replace(new RegExp("-x"), '0');
+                translateProperty = translateProperty.replace(new RegExp("-y"), '0');
+                translateProperty = translateProperty.replace(new RegExp("-scale"), '1');
+                translateProperty = translateProperty.replace(new RegExp("-rotate"), '0');
+                setProperties["-webkit-transform"] = translateProperty;
+                setProperties["-moz-transform"] = translateProperty;
+                setProperties["-ms-transform"] = translateProperty;
+                setProperties["-o-transform"] = translateProperty;
+                setProperties["transform"] = translateProperty;
+                _.each(obj.$obj, function(el) {
+                    g3.setStyle(el, setProperties);
+                });
+            });
+        }
+
+        function calculateKeyFrame() {
+            if(scrollTop > (keyFrames[currentKeyFrame].timeY + curKeyFrameTimeY)) {
+                curKeyFrameTimeY += keyFrames[currentKeyFrame].timeY;
+                currentKeyFrame++;
+                changeKeyFrame(currentKeyFrame);
+            } else if(scrollTop < curKeyFrameTimeY) {
+                currentKeyFrame--;
+                curKeyFrameTimeY -= keyFrames[currentKeyFrame].timeY;
+                changeKeyFrame(currentKeyFrame);
+            }
+        }
+
+        function formatProperties() {
+            _.each(keyFrames, function(d) {
+                d.timeY = 0;
+                d.offsetTimeY = 0;
+                if(!inited) {
+                    var tmpViews = [];
+                    if(_.isArray(d.view)) {
+                        _.each(d.view, function(d) {
+                            _.each(document.querySelectorAll(d), function(el) {
+                                tmpViews.push(el);
+                            });
+                        });
+                    } else {
+                        _.each(document.querySelectorAll(d), function(el) {
+                            tmpViews.push(el);
+                        });
+                    }
+                    views.push(tmpViews);
+                    _.each(d.objects, function(obj) {
+                        var phasesKeys = [];
+                        _.each(obj.phases, function(phase) {
+                            phasesKeys = _.union(phasesKeys, _.filter(_.keys(phase), function(key) {
+                                return key != "id"
+                            }));
+                        });
+                        obj.keys = phasesKeys;
+                    });
+                }
+                d.offsetTimeY = bodyHeight;
+                bodyHeight += d.timeY = convertPercentToPx(d.time, 'y');
+                console.log(d);
+                _.each(d.objects, function(obj) {
+                    obj.$obj = document.querySelectorAll(obj.id);
+                    obj.phasesValues = {};
+                    _.each(obj.phases, function(phase) {
+                        _.each(obj.keys, function(key){
+                            if(phase[key] != undefined) {
+                                var property = null;
+                                if(!obj.phasesValues[key]) {
+                                    obj.phasesValues[key] = [];
+                                }
+                                property = obj.phasesValues[key];
+                                property.push({id:convertPercentToPx(phase.id, "y", d.timeY), val:key == "classes" ? phase[key] : convertPercentToPx(phase[key], "y", d.timeY)});
+                            }
+                        });
+                    });
+                });
+            });
+
+            allView = [];
+            _.each(document.querySelectorAll(".cover"), function(el) {
+                allView.push(el);
+            });
+            _.each(document.querySelectorAll(".slide"), function(el) {
+                allView.push(el);
+            });
+        }
+
+        function changeKeyFrame(frame) {
+            currentKeyFrame = frame;
+            console.log(allView);
+            _.each(allView, function(el) {
+                el.style.display = 'none';
+            });
+            console.log(views[currentKeyFrame]);
+            _.each(views[currentKeyFrame], function(el) {
+                el.style.display = 'block';
+            });
+            scrollContent();
+            animateElements();
+        }
+
+        function convertPercentToPx(value, axis, base) {
+            if(typeof value === "string" && value.match(/%/g)) {
+                value = parseFloat(value)/100;
+                axis = axis || 'x';
+                base = base || ((axis == "x") ? windowWidth : windowHeight);
+                value *= base;
+            }
+            return value;
+        }
+
+        function easeInOutQuad(t, b, c, d) {
+            return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
+        }
     };
 }());
