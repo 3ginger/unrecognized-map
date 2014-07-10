@@ -193,6 +193,8 @@
         g3.igFrame = window.parent.document.getElementById(parentId);
         var fsBtn = document.getElementById("full-screen");
 
+        g3.ig.style.height = g3.ig.style.width = null;
+
         g3.addClass(g3.html, "full-screen");
         window.addEventListener("resize", resize);
         resize();
@@ -383,7 +385,11 @@
                         }
                     });
 
-                    if(property == "classes") {
+                    if(property == "callbacks") {
+                        _.each(obj.phasesValues[property], function(callback) {
+                            callback.call(this, keyFrames[currentKeyFrame], scrollTop/bodyHeight, relativeScrollTop/keyFrames[currentKeyFrame].timeY);
+                        });
+                    } else if(property == "classes") {
                         _.each(obj.phasesValues[property], function(seq, className) {
                             var action = null;
                             var stopSearch = false;
@@ -496,7 +502,7 @@
                 bodyHeight += d.timeY = convertPercentToPx(d.time, 'y');
                 _.each(d.objects, function(obj) {
                     obj.$obj = document.querySelectorAll(obj.id);
-                    obj.phasesValues = {classes:{}};
+                    obj.phasesValues = {classes:{}, callbacks:[]};
                     _.each(obj.phases, function(phase) {
                         _.each(obj.keys, function(key){
                             if(phase[key] != undefined) {
@@ -506,7 +512,20 @@
                                 }
                                 property = obj.phasesValues[key];
 
-                                if(key == "classes") {
+                                if(key == "callbacks") {
+                                    if(_.isArray(phase[key])) {
+                                        _.each(phase[key], function(callback) {
+                                            checkCallBack(callback);
+                                        });
+                                    } else {
+                                        checkCallBack(phase[key]);
+                                    }
+                                    function checkCallBack(callback) {
+                                        if(_.isFunction(callback) && _.indexOf(callback, property) == -1) {
+                                            property.push(callback);
+                                        }
+                                    }
+                                } else if(key == "classes") {
                                     _.each(phase[key].split(" "), function(className, i) {
                                         var classProperty = null;
                                         if(!property[className]) {
@@ -532,7 +551,7 @@
                     });
                 });
             });
-
+            console.log(keyFrames);
             allView = [];
             _.each(document.querySelectorAll(".cover"), function(el) {
                 allView.push(el);

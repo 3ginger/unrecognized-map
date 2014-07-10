@@ -20,7 +20,7 @@
             objects: [
                 {
                     id:".title.slide .main.header",
-                    phases: [{id:"0%", opacity:1, y:0}, {id:"20%", classes:"invert permanent"}, {id:"40%", classes:"invert"}, {id:"60%", y:-200}]
+                    phases: [{callbacks:function(s, p, lp) {console.log(p, lp)}}, {id:"0%", opacity:1, y:0}, {id:"20%", classes:"invert permanent"}, {id:"40%", classes:"invert"}, {id:"60%", y:-200}]
                 },
                 {
                     id:".title.slide .sub.header",
