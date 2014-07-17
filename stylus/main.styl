@@ -65,11 +65,9 @@ text-c = #FFF
         &.global
           background-image url(http://www.bankoboev.ru/images/Mzk1NDcw/Bankoboev.Ru_uzornaya_abstrakciya_s_zavitushkami.jpg)
       .slide
-        position: absolute
-        width: 1024px;
-        height: 768px;
-        left: 50%;
-        top: 50%;
+        position: fixed
+        width: 100%
+        height: 100%
         &.title
           .header
             text-transform uppercase
@@ -85,10 +83,14 @@ text-c = #FFF
               color red
         .fix-context
           position: absolute;
-          width: inherit;
-          height: inherit;
-          left: -50%;
-          top: -50%;
+          work-width = 1024px
+          work-height = 768px
+          margin-left -(work-width/2)
+          margin-top -(work-height/2)
+          left: 50%;
+          top: 50%;
+          width: work-width
+          height: work-height
           .layer
             position inherit
             width: inherit;
