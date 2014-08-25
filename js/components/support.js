@@ -111,32 +111,34 @@
         });
     };
 
-    g3.POST_EXCUSES = ["без", "безо", "близ", "в", "во", "вместо", "вне", "для", "до", "за", "из", "изо", "из-за", "из-под", "к", "ко", "кроме", "между", "меж", "на", "над", "надо", "о", "об", "обо", "от", "ото", "перед", "передо", "пред", "предо", "по", "под", "подо", "при", "про", "ради", "с", "со", "сквозь", "среди", "у", "через", "чрез", "так", "и", "да", "не", "но", "также", "тоже", "ни", "зато", "однако", "же", "или", "либо", "то", "ли", "а", "я", "он"];
+    g3.POST_EXCUSES = ["мы", "она", "они", "оно", "я", "что", "все", "без", "безо", "близ", "в", "во", "вместо", "вне", "для", "до", "за", "из", "изо", "из-за", "из-под", "к", "ко", "кроме", "между", "меж", "на", "над", "надо", "о", "об", "обо", "от", "ото", "перед", "передо", "пред", "предо", "по", "под", "подо", "при", "про", "ради", "с", "со", "сквозь", "среди", "у", "через", "чрез", "так", "и", "да", "не", "но", "также", "тоже", "ни", "зато", "однако", "же", "или", "либо", "то", "ли", "а", "я", "он"];
     g3.PREV_EXCUSES = ["века", "в.", "год", "г.", "года"];
 
     g3.carryUnionsHTML = function(el, text) {
-        var words = (text || el.innerHTML).replace(/ +(?= )/g,'').replace(/></g, "> <").split(" ");
-        text = '';
+        if(el) {
+            var words = (text || el.innerHTML).replace(/ +(?= )/g,'').replace(/></g, "> <").split(" ");
+            text = '';
 
-        _.each(words, function(word, i) {
-            word = word.replace(/[,;:!?()"]/g, '').replace(/<.*?>/gi, '').toLowerCase();
-            var space = "";
+            _.each(words, function(word, i) {
+                word = word.replace(/[,;:!?()"]/g, '').replace(/<.*?>/gi, '').toLowerCase();
+                var space = "";
 
-            if (_.indexOf(g3.POST_EXCUSES, word) != -1) {
-                text += words[i];
-                space = "\u00A0";
-            } else if(_.indexOf(g3.PREV_EXCUSES, word) != -1) {
-                text = text.substr(0, text.length - 1) + "\u00A0" + words[i];
-                space = " ";
-            } else {
-                text += words[i];
-                space = " ";
-            }
-            if(i < (words.length - 1)) {
-                text += space;
-            }
-        });
-        el.innerHTML = text;
+                if (_.indexOf(g3.POST_EXCUSES, word) != -1) {
+                    text += words[i];
+                    space = "\u00A0";
+                } else if(_.indexOf(g3.PREV_EXCUSES, word) != -1) {
+                    text = text.substr(0, text.length - 1) + "\u00A0" + words[i];
+                    space = " ";
+                } else {
+                    text += words[i];
+                    space = " ";
+                }
+                if(i < (words.length - 1)) {
+                    text += space;
+                }
+            });
+            el.innerHTML = text;
+        }
     };
 
     g3.initContent = function(settings) {
@@ -219,13 +221,15 @@
             if(!g3.debugMode && g3.domain) {
                 document.domain = g3.domain;
             }
-            fsBtn.addEventListener('click', function () {
-                if (g3.hasClass(g3.igFrame, "full-screen")) {
-                    g3.removeClass(g3.igFrame, "full-screen");
-                } else {
-                    g3.addClass(g3.igFrame, "full-screen");
-                }
-            });
+            if(fsBtn) {
+                fsBtn.addEventListener('click', function () {
+                    if (g3.hasClass(g3.igFrame, "full-screen")) {
+                        g3.removeClass(g3.igFrame, "full-screen");
+                    } else {
+                        g3.addClass(g3.igFrame, "full-screen");
+                    }
+                });
+            }
         }
 
         function resize() {
@@ -247,63 +251,65 @@
     };
 })();
 //Social buttons and handlers
-(new function () {
-    g3.initSocials = function(settings) {
-        _.each(settings, function(val, key) {
-            settings[key] = encodeURIComponent(val);
-        });
+g3.initSocials = function(settings) {
+    _.each(settings, function(val, key) {
+        settings[key] = encodeURIComponent(val);
+    });
 
-        g3.vkUrl = 'http://vkontakte.ru/share.php' +
-            '?title=' + settings.title +
-            '&description=' + settings.desc +
-            '&url=' + settings.url +
-            '&image=' + settings.img +
-            '&noparse=1';
-        g3.fbUrl = 'http://www.facebook.com/sharer.php' +
-            '?s=100&p[title]=' + settings.title +
-            '&p[summary]=' + settings.desc +
-            '&p[url]=' + settings.url +
-            '&p[images][0]=' + settings.img +
-            '&t=' + settings.title +
-            '&e=' + settings.desc;
-        g3.tUrl = 'https://twitter.com/intent/tweet' +
-            '?status=' + (settings.sDesc || settings.desc);
+    g3.vkUrl = 'http://vkontakte.ru/share.php' +
+        '?title=' + settings.title +
+        '&description=' + settings.desc +
+        '&url=' + settings.url +
+        '&image=' + settings.img +
+        '&noparse=1';
+    g3.fbUrl = 'http://www.facebook.com/sharer.php' +
+        '?s=100&p[title]=' + settings.title +
+        '&p[summary]=' + settings.desc +
+        '&p[url]=' + settings.url +
+        '&p[images][0]=' + settings.img +
+        '&t=' + settings.title +
+        '&e=' + settings.desc;
+    g3.tUrl = 'https://twitter.com/intent/tweet' +
+        '?status=' + (settings.sDesc || settings.desc);
 
-        document.getElementById("vk").addEventListener("click", function() {
+    var vk = document.getElementById("vk"),
+        fb = document.getElementById("fb"),
+        t = document.getElementById("t");
+    if(vk) {
+        vk.addEventListener("click", function() {
             window.open(g3.vkUrl, 'sharer', 'toolbar=0,status=0,width=626,height=436');
         });
-        document.getElementById("fb").addEventListener("click", function() {
+    }
+    if(fb) {
+        fb.addEventListener("click", function() {
             window.open(g3.fbUrl, 'sharer', 'toolbar=0,status=0,width=626,height=436');
         });
-        document.getElementById("t").addEventListener("click", function() {
+    }
+    if(t) {
+        t.addEventListener("click", function() {
             window.open(g3.tUrl, 'sharer', 'toolbar=0,status=0,width=626,height=436');
         });
-    };
+    }
+};
+(new function () {
 }());
 //parallax
 (new function () {
     g3.initParallax = function(settings) {
-        var keyFrames = settings.keyFrames || [];
+        var keyframes = settings.keyFrames || [];
         var frameRate = settings.frameRate || 60;
         var mobileFrameRate = settings.mobileFrameRate || frameRate;
+        var animationSmooth = settings.animationSmooth || 10;
+        var minScrollAnimate = settings.minScrollAnimate || 10;
+        var maxScrollAnimate = settings.maxScrollAnimate || 100;
+        var typeBrowser = g3.browser_info[0];
+        var keyElements = settings.keyElements || ['.slide', '.cover'];
 
-        var views = [], allView = null, currentKeyFrame = 0, inited = false;
-        var scrollTop = 0, relativeScrollTop = 0, curKeyFrameTimeY = 0, windowHeight = 0, windowWidth = 0, bodyHeight = 1, scrollDirect = true;
-        var checkTouchMove = false, lastTouchPoint = 0, touchScrollTop = 0;
-        var intProperties = ['x', 'y', 'rotate', 'left', 'right', 'top', 'bottom'], stringProperties = ['display'];
-
-        //init
-        g3.addClass(g3.html, "parallax");
-        if(keyFrames.length > 0) {
-            window.addEventListener('resize', setupValues);
-            setupValues();
-            setInterval(updatePage, 1000/(isMobile ? mobileFrameRate : frameRate));
-            changeKeyFrame(0);
-            inited = true;
-        }
+        var scrollStep = 1;
 
         //touch
         if(isMobile) {
+            scrollStep = 2;
             document.addEventListener("touchstart", function (e) {
                 if (e.touches.length == 1) {
                     var touch = e.touches[0];
@@ -324,25 +330,92 @@
             });
             document.addEventListener("touchmove", function (e) {
                 if(checkTouchMove) {
-                    var touch = e.touches[0];
-                    touchScrollTop += (lastTouchPoint - touch.pageY);
-                    touchScrollTop = touchScrollTop < 0 ? 0 : touchScrollTop >= bodyHeight ? bodyHeight :touchScrollTop;
-                    lastTouchPoint = touch.pageY;
+                    var touchY = e.touches[0].pageY;
+                    var offset = (lastTouchPoint - touchY);
+                    correctNextScrollTop(nextScrollTop1 + offset);
+                    lastTouchPoint = touchY;
                 }
             });
+        } else {
+            if(typeBrowser == "Firefox") {
+                scrollStep = 33;
+                g3.body.addEventListener('DOMMouseScroll', function(e) {
+                    correctNextScrollTop(nextScrollTop1 + e.detail * scrollStep);
+                });
+            } else if(typeBrowser == "IE" || typeBrowser == "Safari") {
+                g3.body.addEventListener('mousewheel', function(e) {
+                    scrollStep = .84;
+                    correctNextScrollTop(nextScrollTop1 - e.wheelDelta * scrollStep);
+                    e.preventDefault();
+                    return false;
+                });
+            } else {
+                g3.body.addEventListener('mousewheel', function(e) {
+                    correctNextScrollTop(nextScrollTop1 + e.deltaY * scrollStep);
+                });
+            }
         }
 
+
+
+        function correctNextScrollTop(tmpScrollTop) {
+            nextScrollTop1 = parseInt(tmpScrollTop > bodyHeight ? bodyHeight : tmpScrollTop < 0 ? 0 : tmpScrollTop);
+            window.scrollTo(0, nextScrollTop1);
+        }
+
+        var inited = false, updateContent = false, forceUpdateContent = false;
+        var views = [], allView = null;
+        var keyframe = null, keyframeIndex = -1, keyframeTime = 0, lastKeyFrameIndex = -1;
+        var windowHeight = 0, windowWidth = 0, bodyHeight = 1;
+
+        var scrollTop = 0, relativeScrollTop = 0, scrollDirect = 0;
+        //desktop
+        var nextScrollTop = 0, nextScrollTop1 = 0;
+        //mobile
+        var checkTouchMove = false, lastTouchPoint = 0, nextTouchScrollTop = 0;
+
+
+        var intProperties = ['x', 'y', 'rotate', 'left', 'right', 'top', 'bottom', 'height'], stringProperties = ['display'];
+
+        g3.getKeyframeIndex = function() {
+            return keyframeIndex;
+        };
+
+        g3.getKeyframeLabel = function() {
+            return keyframe.label || keyframeIndex;
+        };
+
+        allView = [];
+        _.each(keyElements, function(keyElementName) {
+            _.each(document.querySelectorAll(keyElementName), function(el) {
+                allView.push(el);
+            });
+        });
+
+        //init
+        g3.addClass(g3.html, "parallax");
+        if(keyframes.length > 0) {
+            window.addEventListener('resize', setupValues);
+            setupValues();
+            setInterval(updatePage, 1000/(isMobile ? mobileFrameRate : frameRate));
+            changeKeyFrame(0);
+            inited = true;
+        }
+
+
+
         function setupValues() {
-            var lastProgress = scrollTop/bodyHeight;
-            bodyHeight = 0;
-            currentKeyFrame = 0;
-            curKeyFrameTimeY = 0;
+            forceUpdateContent = true;
+            var lastProgress = scrollTop/bodyHeight, lastNextProgress = nextScrollTop/bodyHeight;
+            bodyHeight = 1;
+            keyframeIndex = -1;
+            keyframeTime = 0;
             relativeScrollTop = 0;
 
             windowWidth = g3.getWindowWidth();
             windowHeight = g3.getWindowHeight();
-
             formatProperties();
+            nextScrollTop = parseInt(lastNextProgress * bodyHeight);
             scrollTop = parseInt(lastProgress * bodyHeight);
 
             g3.body.style.height = bodyHeight + "px";
@@ -353,22 +426,75 @@
         function updatePage() {
             window.requestAnimationFrame(function() {
                 scrollContent();
-                if(scrollTop >= 0 && scrollTop <= (bodyHeight - windowHeight)) {
-                    calculateKeyFrame();
-                    animateElements();
+                if(updateContent) {
+                    animateElements(keyframe, relativeScrollTop);
                 }
             });
         }
 
         function scrollContent() {
-            var nextScroll = isMobile ? touchScrollTop : window.pageYOffset;
-            scrollDirect = (nextScroll >= scrollTop);
-            scrollTop = nextScroll;
-            relativeScrollTop = scrollTop - curKeyFrameTimeY;
+            var nextScrollTop = isMobile ? nextTouchScrollTop : (window.pageYOffset);
+            if(forceUpdateContent || nextScrollTop != scrollTop) {
+                updateContent = true;
+                forceUpdateContent = false;
+                if(nextScrollTop > scrollTop) {
+                    scrollDirect = 1;
+                    //scrollTop += .01;
+                } else if(nextScrollTop < scrollTop) {
+                    scrollDirect = -1;
+                    //scrollTop -= .01;
+                } else {
+                    scrollDirect = 0;
+                }
+
+                var nextStopPoint = -1;
+                if(keyframe.stopPointsY) {
+                    for (var i = 0, len = keyframe.stopPointsY.length; i < len - 1; i++) {
+                        var beginPoint = keyframe.stopPointsY[i] + keyframe.offsetTimeY, endPoint = keyframe.stopPointsY[i+1] + keyframe.offsetTimeY;
+                        if(scrollTop > beginPoint && scrollTop < endPoint) {
+                            if(scrollDirect == 1) {
+                                nextStopPoint = endPoint;
+                            } else if(scrollDirect == -1) {
+                                nextStopPoint = beginPoint;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+
+                if(nextStopPoint > -1) {
+                    nextStopPoint = parseInt(nextStopPoint);
+                    nextScrollTop = nextStopPoint;
+                }
+
+                var offsetFull = (nextScrollTop - scrollTop);
+                var offset = parseInt(offsetFull/animationSmooth);
+                offset = offset > maxScrollAnimate ? maxScrollAnimate : offset;
+                if(offset > 0) {
+                    offset = offset < minScrollAnimate ? minScrollAnimate : offset;
+                } else if(offset < 0) {
+                    offset = offset > -minScrollAnimate ? -minScrollAnimate : offset;
+                }
+
+                if(offset == 0) {
+                    scrollTop = nextScrollTop;
+                } else {
+                    scrollTop = scrollTop + offset;
+                }
+                if(updateContent) {
+                    window.scrollTo(0, nextScrollTop);
+                    nextScrollTop1 = nextScrollTop;
+                    calculateKeyFrame();
+                    relativeScrollTop = scrollTop - keyframeTime;
+                }
+            } else {
+                updateContent = false;
+            }
         }
 
-        function animateElements() {
-            _.each(keyFrames[currentKeyFrame].objects, function(obj) {
+        function animateElements(keyframe, relativeScrollTop) {
+            _.each(keyframe.objects, function(obj) {
                 var newProperties = {};
                 _.each(obj.phasesValues, function(values, property) {
                     var beginVal = null;
@@ -387,7 +513,7 @@
 
                     if(property == "callbacks") {
                         _.each(obj.phasesValues[property], function(callback) {
-                            callback.call(this, keyFrames[currentKeyFrame], scrollTop/bodyHeight, relativeScrollTop/keyFrames[currentKeyFrame].timeY);
+                            callback.call(this, keyframe, scrollTop/bodyHeight, relativeScrollTop/keyframe.timeY, keyframeIndex, lastKeyFrameIndex, scrollDirect);
                         });
                     } else if(property == "classes") {
                         _.each(obj.phasesValues[property], function(seq, className) {
@@ -431,13 +557,13 @@
                 var setProperties = {};
                 _.each(newProperties, function(d, k) {
                     if(k == "x") {
-                        translateProperty = translateProperty.replace(new RegExp("-x"), parseInt(d));
+                        translateProperty = translateProperty.replace("-x", parseInt(d));
                     } else if(k == "y") {
-                        translateProperty = translateProperty.replace(new RegExp("-y"), parseInt(d));
+                        translateProperty = translateProperty.replace("-y", parseInt(d));
                     } else if(k == "scale") {
-                        translateProperty = translateProperty.replace(new RegExp("-scale"), d);
+                        translateProperty = translateProperty.replace("-scale", d);
                     } else if(k == "rotate") {
-                        translateProperty = translateProperty.replace(new RegExp("-rotate"), d);
+                        translateProperty = translateProperty.replace("-rotate", d);
                     } else {
                         setProperties[k] = d;
                     }
@@ -459,33 +585,38 @@
         }
 
         function calculateKeyFrame() {
-            if(scrollTop > (keyFrames[currentKeyFrame].timeY + curKeyFrameTimeY)) {
-                curKeyFrameTimeY += keyFrames[currentKeyFrame].timeY;
-                currentKeyFrame++;
-                changeKeyFrame(currentKeyFrame);
-            } else if(scrollTop < curKeyFrameTimeY) {
-                currentKeyFrame--;
-                curKeyFrameTimeY -= keyFrames[currentKeyFrame].timeY;
-                changeKeyFrame(currentKeyFrame);
+            for (var i = 0, len = keyframes.length; i < len; i++) {
+                var tmpKeyframe = keyframes[i];
+                if(scrollTop >= tmpKeyframe.offsetTimeY && scrollTop < tmpKeyframe.endOffsetTimeY) {
+                    changeKeyFrame(tmpKeyframe.id);
+                    break;
+                }
             }
         }
 
         function formatProperties() {
-            _.each(keyFrames, function(d) {
+            _.each(keyframes, function(d, i) {
                 d.timeY = 0;
                 d.offsetTimeY = 0;
+                d.stopPointsY = d.stopPointsY || [];
+                d.stopPointsY.length = 0;
+                d.id = i;
                 if(!inited) {
                     var tmpViews = [];
                     if(_.isArray(d.view)) {
                         _.each(d.view, function(d) {
-                            _.each(document.querySelectorAll(d), function(el) {
-                                tmpViews.push(el);
-                            });
+                            if(d) {
+                                _.each(document.querySelectorAll(d), function(el) {
+                                    tmpViews.push(el);
+                                });
+                            }
                         });
                     } else {
-                        _.each(document.querySelectorAll(d), function(el) {
-                            tmpViews.push(el);
-                        });
+                        if(d) {
+                            _.each(document.querySelectorAll(d), function (el) {
+                                tmpViews.push(el);
+                            });
+                        }
                     }
                     views.push(tmpViews);
                     _.each(d.objects, function(obj) {
@@ -499,7 +630,11 @@
                     });
                 }
                 d.offsetTimeY = bodyHeight;
-                bodyHeight += d.timeY = convertPercentToPx(d.time, 'y');
+                bodyHeight += d.timeY = parseInt(convertPercentToPx(d.time, 'y'));
+                d.endOffsetTimeY = d.offsetTimeY + d.timeY;
+                _.each(d.stopPoints, function(per) {
+                    d.stopPointsY.push(convertPercentToPx(per, 'y', d.timeY));
+                });
                 _.each(d.objects, function(obj) {
                     obj.$obj = document.querySelectorAll(obj.id);
                     obj.phasesValues = {classes:{}, callbacks:[]};
@@ -513,6 +648,11 @@
                                 property = obj.phasesValues[key];
 
                                 if(key == "callbacks") {
+                                    function checkCallBack(callback) {
+                                        if(_.isFunction(callback) && _.indexOf(callback, property) == -1) {
+                                            property.push(callback);
+                                        }
+                                    }
                                     if(_.isArray(phase[key])) {
                                         _.each(phase[key], function(callback) {
                                             checkCallBack(callback);
@@ -520,28 +660,30 @@
                                     } else {
                                         checkCallBack(phase[key]);
                                     }
-                                    function checkCallBack(callback) {
-                                        if(_.isFunction(callback) && _.indexOf(callback, property) == -1) {
-                                            property.push(callback);
-                                        }
-                                    }
                                 } else if(key == "classes") {
                                     _.each(phase[key].split(" "), function(className, i) {
                                         var classProperty = null;
                                         if(!property[className]) {
                                             property[className] = [];
+                                            property[className].push({id:0, val:'remove'});
+                                            property[className].push({id:parseInt(convertPercentToPx("100%", "y", d.timeY)), val:'remove'});
                                         }
                                         classProperty = property[className];
-                                        if(classProperty.length == 0) {
-                                            classProperty.push({id:0, val:'remove'});
-                                            classProperty.push({id:convertPercentToPx("100%", "y", d.timeY), val:'remove'});
+
+                                        var lastPhase = classProperty[classProperty.length - 2];
+                                        var nextId = parseInt(convertPercentToPx(phase.id, "y", d.timeY));
+                                        var nextVal = lastPhase.val == 'add' ? 'remove' : 'add';
+                                        if(nextId == lastPhase.id) {
+                                            lastPhase.val = nextVal;
+                                        } else if(nextId > lastPhase.id) {
+                                            var nextPhase = {id:nextId, val:nextVal};
+                                            classProperty.splice(classProperty.length - 1, 0, nextPhase);
+                                            lastPhase = nextPhase;
                                         }
-                                        var lastVal = classProperty[classProperty.length - 2].val;
-                                        classProperty.splice(classProperty.length - 1, 0, {id:convertPercentToPx(phase.id, "y", d.timeY), val:lastVal == 'add' ? 'remove' : 'add'});
                                     });
                                 } else {
-                                    var nextVal = convertPercentToPx(phase[key], "y", d.timeY);
-                                    if(_.indexOf(intProperties, key)) {
+                                    var nextVal = convertPercentToPx(phase[key], key);
+                                    if(_.indexOf(intProperties, key) == -1) {
                                         nextVal = parseInt(nextVal);
                                     }
                                     property.push({id:convertPercentToPx(phase.id, "y", d.timeY), val:nextVal});
@@ -551,26 +693,35 @@
                     });
                 });
             });
-            console.log(keyFrames);
-            allView = [];
-            _.each(document.querySelectorAll(".cover"), function(el) {
-                allView.push(el);
-            });
-            _.each(document.querySelectorAll(".slide"), function(el) {
-                allView.push(el);
-            });
         }
 
-        function changeKeyFrame(frame) {
-            currentKeyFrame = frame;
-            _.each(allView, function(el) {
-                el.style.display = 'none';
-            });
-            _.each(views[currentKeyFrame], function(el) {
-                el.style.display = 'block';
-            });
-            scrollContent();
-            animateElements();
+        function changeKeyFrame(frame, force) {
+            if(frame != keyframeIndex) {
+                force = force || false;
+                /*if(keyframeIndex != -1) {
+                 if(keyframeIndex < frame) {
+                 animateElements(keyframe, 0);
+                 } else {
+                 animateElements(keyframe, keyframe.timeY);
+                 }
+                 }*/
+                lastKeyFrameIndex = keyframeIndex;
+                keyframeIndex = frame;
+                keyframe = keyframes[keyframeIndex];
+                keyframeTime = keyframe.offsetTimeY;
+
+                _.each(allView, function(el) {
+                    el.style.display = 'none';
+                });
+                _.each(views[keyframeIndex], function(el) {
+                    el.style.display = 'block';
+                });
+
+                if(force) {
+                    scrollContent();
+                    animateElements();
+                }
+            }
         }
 
         function convertPercentToPx(value, axis, base) {
@@ -580,11 +731,31 @@
                 base = base || ((axis == "x") ? windowWidth : windowHeight);
                 value *= base;
             }
-            return value;
+            return parseFloat(value);
         }
 
         function easeInOutQuad(t, b, c, d) {
             return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
         }
+
+        g3.changeKeyFrame = function(index, force) {
+            force = force || false;
+            if(_.isString(index)) {
+                var result = _.findWhere(keyframes, {label:index});
+                move(result.offsetTimeY);
+            } else {
+                if(index >= 0 && index < keyframes.length) {
+                    move(keyframes[index].offsetTimeY);
+                }
+            }
+            function move(position) {
+                forceUpdateContent = true;
+                window.scrollTo(0, position);
+                nextScrollTop1 = position;
+                if(force) {
+                    scrollTop = position;
+                }
+            }
+        };
     };
 }());

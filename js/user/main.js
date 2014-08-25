@@ -5,6 +5,7 @@
     //g3.initFullScreen("test-fs");
     g3.initMobile();
 
+    //социальные кнопки
     g3.initSocials({
         title:"test title",
         desc:"test desc",
@@ -14,6 +15,7 @@
         img:""
     });
 
+    //пример паралакса
     g3.initParallax({keyFrames:[{
             view: [".global.bgr.cover", ".fader.cover", ".title.slide"],
             time: "200%",
@@ -35,9 +37,24 @@
         }
     ]});
 
-    g3.carryUnionsHTML(document.querySelectorAll(".main.header")[0]);
+
+    //висячие предлоги
+    var listForCarryUnion = [];
+    addElements(listForCarryUnion, document.querySelectorAll(".title"));
+    addElements(listForCarryUnion, document.querySelectorAll(".desc"));
+
+    _.each(listForCarryUnion, function(el) {
+        g3.carryUnionsHTML(el);
+    });
+
+
+    function addElements(listForCarryUnion, addedList) {
+        _.each(addedList, function(el) {
+            listForCarryUnion.push(el);
+        });
+    }
+
 
     //start here
-
-
 })();
+
