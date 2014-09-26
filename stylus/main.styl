@@ -2,7 +2,15 @@
 main-c = #CCC
 fade-c = #333
 text-c = #FFF
+text-c2 = #6D6E70
+mc = #1D272A
+mc2 = #2E393C
+nac = #FFC519
+unna = #F3740D
+un = #A1A4A7
 
+*
+  user-select none
 #ig
   position: absolute
   left: 0
@@ -26,92 +34,61 @@ text-c = #FFF
       size-btn = 50px
       width: size-btn
       height: size-btn
-      background-color fade-c
       &.rounded
         border-radius 5px
-    &#full-screen
-      &.default
-        width: 100px
-        height: 50px
-        background-color fade-c
-        position: absolute
-        bottom: 20px
-        right: 20px
-  html.parallax &
-    position: fixed
-    width: 100%
-    height: 100%
-    background-color fade-c
-    .content
-      position inherit
-      width inherit
-      height: inherit
-      .btn
-        &.social
-          background-color text-c
-        &#full-screen.default
-          background-color text-c
-      .cover
-        position: absolute
-        left: 0
-        top: 0
-        width inherit
-        height: inherit
-        background-repeat no-repeat
-        background-position center center
-        &.fader
-          background-color fade-c
-          opacity: .5
-        &.global
-          background-image url(http://www.bankoboev.ru/images/Mzk1NDcw/Bankoboev.Ru_uzornaya_abstrakciya_s_zavitushkami.jpg)
-      .slide
-        position: fixed
-        width: 100%
-        height: 100%
-        &.title
-          .header
-            text-transform uppercase
-            text-align center
-            transition color .5s
-            &.main
-              font-size: 40px
-              font-weight bold
-            &.sub
-              font-size: 20px
-              font-weight normal
-            &.invert
-              color red
-        .context
-          position: absolute;
-          &.flex
-            width 100%
-            height: 100%
-          &.fix
-            fix-content-width = 1024px
-            fix-content-height = 768px
-            margin-left -(fix-content-width/2)
-            margin-top -(fix-content-height/2)
-            left: 50%;
-            top: 50%;
-            width: fix-content-width
-            height: fix-content-height
-          .layer
-            position absolute
-            width: inherit
-            height: inherit
-  html.full-screen &
-    background-color fade-c
-    width: 100%
-    height: 100%
   .content
-    background-color main-c
     position absolute
     left: 0
     top: 0
-    html.full-screen &
-      transform scale(1)
-      transform-origin 0 0
-
+    .ig-logo
+      position: absolute
+      font-family PTSans
+      color #949494
+      font-size 10px
+      left: 20px
+      bottom: 20px
+    .lenta-logo
+      position: absolute
+      right: 20px
+      bottom: 15px
+    .map
+      width: 100%
+      height: 100%
+      background-color: #1d272a;
+      .filter
+        .header
+          cursor pointer
+          rect
+            fill #2E393C
+          .border-point
+            stroke-width 1.5px
+            stroke #898989
+            fill none
+          text
+            fill #E7E7E7
+            font-family PTSansCaption
+            font-size 10px
+            text-transform uppercase
+          .inner-circle
+            opacity 0
+            fill white
+            transition opacity .3s
+          &.selected
+            .inner-circle
+              opacity 1
+      .filter-point
+        cursor pointer
+      .approve-line
+        stroke-width 1px
+        stroke nac
+        opacity: .4
+      .border-line
+        stroke-width 1px
+        stroke white
+        opacity .1
+      #rects
+        rect
+          cursor pointer
 /*browser settings*/
 html
   #browsehappy
