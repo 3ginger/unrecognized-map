@@ -116,7 +116,7 @@
 
     function viewProblemPopup(curPointData) {
         problemPopup.classed('disabled', true);
-        if(curPointData.tag == "na") {
+        if(curPointData.tag == "na" || curPointData.tag == "unna") {
             naInfoBtn
                 .classed('disabled', false)
                 .style('left', curPointData.position[0] + mapPointOffset + 'px')
