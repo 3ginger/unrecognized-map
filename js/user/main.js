@@ -9,10 +9,10 @@
     var mapPointSize = 5, mapPointOffset = mapPointSize/2;
     var filters = null, filterPoints = null;
     var filtersInfo = [
-        {title:"Признали", prop:"approveList"},
-        {title:"Не признали", prop:"negativeList"},
-        {title:"Признают", prop:"approvedList"},
-        {title:"Не признают", prop:"negativedList"}
+        {title:"Кто признаёт", prop:"approveList"},
+        {title:"Кто не признаёт", prop:"negativeList"},
+        {title:"Кого признаёт", prop:"approvedList"},
+        {title:"Кого не признаёт", prop:"negativedList"}
     ], filterPointOffset = 2, numPointsInLine = 20,
         filterWidth = (mapPointSize + filterPointOffset)*numPointsInLine - filterPointOffset,
         filterOffset = 30, filterPosition = [1280 - filtersInfo.length * (filterWidth + filterOffset) + 40 - filterOffset, 20];
