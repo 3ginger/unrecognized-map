@@ -21,7 +21,9 @@
     var problemPopup = d3.select('.problem-popup'), infoPopup = d3.select('.popup'), naInfoBtn = d3.select('.na-info.btn');
     var infoPopupOffset = 10;
 
-
+    problemPopup.on('click', function() {
+        problemPopup.classed('disabled', true);
+    });
     d3.tsv('data.csv', function(data) {
         allData = data;
 
