@@ -19,6 +19,9 @@ body
 
 *
   user-select none
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision
+
 .disabled
   display: none
 #ig
@@ -84,6 +87,7 @@ body
               .val
                 font-size: 39px
                 line-height: 29px;
+                font-family RoboBold
               .percent-sign
                 font-size: 20px
                 line-height: 10px;
@@ -132,7 +136,7 @@ body
         margin-left: -(s/2)
         margin-top: -(s/2)
         background-color: unna
-        color black
+        color text-c2
         text-align: center
         line-height: s
         position: absolute
@@ -208,9 +212,13 @@ body
             text-transform uppercase
           .inner-circle
             opacity 0
-            fill white
+            fill text-c2
             transition opacity .3s
           &.selected
+            text
+              fill text-c2
+            rect
+              fill unna
             .inner-circle
               opacity 1
       .filter-point
