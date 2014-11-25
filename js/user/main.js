@@ -21,6 +21,7 @@
     var problemPopup = d3.select('.problem-popup'), infoPopup = d3.select('.popup'), naInfoBtn = d3.select('.na-info.btn');
     var infoPopupOffset = 10;
 
+
     d3.tsv('data.csv', function(data) {
         allData = data;
 
@@ -84,94 +85,12 @@
                 .key(function(d){ return d.tag;})
                 .entries(allData);
 
-            var curPointData = null;
             mapPoints.on('click', function(data) {
                 curPoint = d3.select(this);
                 drawApproveLines.call(curPoint, curFilter.prop);
                 drawFilters.call(this);
 
-                curPointData = data;
-                problemPopup.classed('disabled', true);
-                if(data.tag == "na") {
-                    naInfoBtn
-                        .classed('disabled', false)
-                        .style('left', data.position[0] + mapPointOffset + 'px')
-                        .style('top', data.position[1] + mapPointOffset + 'px')
-                        .on('click', function() {
-                            problemPopup.classed('disabled', false)
-                                .selectAll('.list .line')
-                                .classed('disabled', true);
-                            var problem = curPointData.problem;
-                            problemPopup.select('.title').text(problem.title);
-
-                            if(problem.metropolis) {
-                                var metropolisInfo = _.findWhere(allData, {id:problem.metropolis});
-                                problemPopup.select('.metropolis')
-                                    .classed('disabled', false)
-                                    .select('.val')
-                                    .text(metropolisInfo.title);
-                            }
-
-                            if(problem.when) {
-                                problemPopup.select('.year')
-                                    .classed('disabled', false)
-                                    .select('.val')
-                                    .text(problem.when + ' год');
-                            }
-
-                            if(problem.square) {
-                                problemPopup.select('.square')
-                                    .classed('disabled', false)
-                                    .select('.val')
-                                    .text(problem.square + " км");
-                            }
-
-                            if(problem.population) {
-                                problemPopup.select('.populas')
-                                    .classed('disabled', false)
-                                    .select('.val')
-                                    .text(problem.population + " тыс. чел.");
-                            }
-
-
-                            problemPopup.select('.percents .people .inside-rect')
-                                .style('width', 0)
-                                .style('height', 0)
-                                .interrupt()
-                                .transition()
-                                .style('width', 50 * problem.populationPercent + 'px')
-                                .style('height', 50 * problem.populationPercent + 'px');
-
-                            problemPopup.select('.percents .people .val')
-                                .text(0)
-                                .interrupt()
-                                .transition()
-                                .text(parseInt(problem.populationPercent * 100));
-
-
-                            problemPopup.select('.percents .square .inside-rect')
-                                .style('width', 0)
-                                .style('height', 0)
-                                .interrupt()
-                                .transition()
-                                .style('width', 50 * problem.squarePercent + 'px')
-                                .style('height', 50 * problem.squarePercent + 'px');
-
-                            problemPopup.select('.percents .square .val')
-                                .text(parseInt(problem.squarePercent * 100));
-
-                            if(problem.desc) {
-                                problemPopup.select('.about')
-                                    .text(g3.carryUnionsHTML2(problem.desc))
-                                    .classed('disabled', false);
-                            } else {
-                                problemPopup.select('.about')
-                                    .classed('disabled', true);
-                            }
-                        });
-                } else {
-                    naInfoBtn.on('click', null).classed('disabled', true);
-                }
+                viewProblemPopup(data);
             }).on('mouseover', function(data) {
                 var mousePos = d3.mouse(this);
                 infoPopup.text(data.title)
@@ -194,6 +113,90 @@
         curFilter = d3.select(this).classed('selected', true).datum();
     }
 
+
+    function viewProblemPopup(curPointData) {
+        problemPopup.classed('disabled', true);
+        if(curPointData.tag == "na") {
+            naInfoBtn
+                .classed('disabled', false)
+                .style('left', curPointData.position[0] + mapPointOffset + 'px')
+                .style('top', curPointData.position[1] + mapPointOffset + 'px')
+                .on('click', function() {
+                    problemPopup.classed('disabled', false)
+                        .selectAll('.list .line')
+                        .classed('disabled', true);
+                    var problem = curPointData.problem;
+                    problemPopup.select('.title').text(problem.title);
+
+                    if(problem.metropolis) {
+                        var metropolisInfo = _.findWhere(allData, {id:problem.metropolis});
+                        problemPopup.select('.metropolis')
+                            .classed('disabled', false)
+                            .select('.val')
+                            .text(metropolisInfo.title);
+                    }
+
+                    if(problem.when) {
+                        problemPopup.select('.year')
+                            .classed('disabled', false)
+                            .select('.val')
+                            .text(problem.when + ' год');
+                    }
+
+                    if(problem.square) {
+                        problemPopup.select('.square')
+                            .classed('disabled', false)
+                            .select('.val')
+                            .text(problem.square + " км");
+                    }
+
+                    if(problem.population) {
+                        problemPopup.select('.populas')
+                            .classed('disabled', false)
+                            .select('.val')
+                            .text(problem.population + " тыс. чел.");
+                    }
+
+
+                    problemPopup.select('.percents .people .inside-rect')
+                        .style('width', 0)
+                        .style('height', 0)
+                        .interrupt()
+                        .transition()
+                        .style('width', 50 * problem.populationPercent + 'px')
+                        .style('height', 50 * problem.populationPercent + 'px');
+
+                    problemPopup.select('.percents .people .val')
+                        .text(0)
+                        .interrupt()
+                        .transition()
+                        .text(parseInt(problem.populationPercent * 100));
+
+
+                    problemPopup.select('.percents .square .inside-rect')
+                        .style('width', 0)
+                        .style('height', 0)
+                        .interrupt()
+                        .transition()
+                        .style('width', 50 * problem.squarePercent + 'px')
+                        .style('height', 50 * problem.squarePercent + 'px');
+
+                    problemPopup.select('.percents .square .val')
+                        .text(parseInt(problem.squarePercent * 100));
+
+                    if(problem.desc) {
+                        problemPopup.select('.about')
+                            .text(g3.carryUnionsHTML2(problem.desc))
+                            .classed('disabled', false);
+                    } else {
+                        problemPopup.select('.about')
+                            .classed('disabled', true);
+                    }
+                });
+        } else {
+            naInfoBtn.on('click', null).classed('disabled', true);
+        }
+    }
     function addFilters() {
         filters = d3.select('#filters').selectAll('.filter')
             .data(filtersInfo).enter()
@@ -264,6 +267,15 @@
                     curPoint = d.mapPoint;
                     drawFilters.call(this);
                     drawApproveLines.call(curPoint, curFilter.prop);
+                    viewProblemPopup(d);
+                }).on('mouseover', function(data) {
+                    var mousePos = d3.mouse(d3.select('.content')[0][0]);
+                    infoPopup.text(data.title)
+                        .style('left', mousePos[0] + infoPopupOffset + 'px')
+                        .style('top', mousePos[1] + infoPopupOffset + 'px')
+                        .classed('disabled', false);
+                }).on('mouseout', function() {
+                    infoPopup.classed('disabled', true);
                 });
 
             pointRects.transition()
