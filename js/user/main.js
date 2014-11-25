@@ -100,7 +100,7 @@
             }).on('mouseout', function() {
                infoPopup.classed('disabled', true);
             });
-            //drawBorderLines();
+            drawBorderLines();
             //hideBorderLines();
         });
     });
