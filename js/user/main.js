@@ -18,51 +18,172 @@
         filterOffset = 30, filterPosition = [1280 - filtersInfo.length * (filterWidth + filterOffset) + 40 - filterOffset, 20];
 
     var curPoint = null, curFilter = null;
+    var problemPopup = d3.select('.problem-popup'), infoPopup = d3.select('.popup'), naInfoBtn = d3.select('.na-info.btn');
+    var infoPopupOffset = 10;
 
     d3.tsv('data.csv', function(data) {
         allData = data;
-        _.each(data, function(d) {
-            d.mapPoint = d3.select('#' + d.id);
-            d.mapPoint.datum(d).style('fill', mapPointColors[d.tag.toLowerCase()]);
-            d.position = [+d.mapPoint.attr('x'), +d.mapPoint.attr('y')];
-            d.tag = d.tag.toLowerCase();
-            if(d.borderList) {
-                d.borderList = updateLinks(d.borderList.replace(/\s{1,}/g, '').split(','), data);
-            } else {
-                d.borderList = [];
-            }
 
-            if(d.approveList) {
-                d.approveList = updateLinks(d.approveList.replace(/\s{1,}/g, '').split(','), data);
-            } else {
-                d.approveList = [];
-            }
+        d3.tsv('problems.csv', function(problemData) {
+            //format data
+            _.each(allData, function(d) {
+                d.mapPoint = d3.select('#' + d.id);
+                d.mapPoint.datum(d).style('fill', mapPointColors[d.tag.toLowerCase()]);
+                d.position = [+d.mapPoint.attr('x'), +d.mapPoint.attr('y')];
+                d.tag = d.tag.toLowerCase();
+                if(d.borderList) {
+                    d.borderList = updateLinks(d.borderList.replace(/\s{1,}/g, '').split(','), allData);
+                } else {
+                    d.borderList = [];
+                }
 
-            if(d.negativeList) {
-                d.negativeList = updateLinks(d.negativeList.replace(/\s{1,}/g, '').split(','), data);
-            } else {
-                d.negativeList = [];
-            }
+                if(d.approveList) {
+                    d.approveList = updateLinks(d.approveList.replace(/\s{1,}/g, '').split(','), allData);
+                } else {
+                    d.approveList = [];
+                }
 
-            d.approvedList = [];
-            d.negativedList = [];
+                if(d.negativeList) {
+                    d.negativeList = updateLinks(d.negativeList.replace(/\s{1,}/g, '').split(','), allData);
+                } else {
+                    d.negativeList = [];
+                }
+
+                d.approvedList = [];
+                d.negativedList = [];
+            });
+            balanceLinks(allData);
+            invertLinks(allData);
+
+
+            _.each(problemData, function(problem) {
+                problem.square = +problem.square;
+                problem.metropolisSquare = +problem.metropolisSquare;
+                problem.population = +problem.population;
+                problem.metropolisPopulation = +problem.metropolisPopulation;
+                if(problem.metropolisSquare) {
+                    problem.squarePercent = problem.square / problem.metropolisSquare;
+                } else {
+                    problem.squarePercent = 0;
+                }
+                if(problem.metropolisPopulation) {
+                    problem.populationPercent = problem.population / problem.metropolisPopulation;
+                } else {
+                    problem.populationPercent = 0;
+                }
+                var node = _.findWhere(allData, {id:problem.id});
+                if(node) {
+                    node.problem = problem;
+                } else {
+                    console.log('problem id = ', problem.id);
+                }
+            });
+            console.log(allData);
+            borderList = formatBorderList(allData);
+            tagData = d3.nest()
+                .key(function(d){ return d.tag;})
+                .entries(allData);
+
+            var curPointData = null;
+            mapPoints.on('click', function(data) {
+                curPoint = d3.select(this);
+                drawApproveLines.call(curPoint, curFilter.prop);
+                drawFilters.call(this);
+
+                curPointData = data;
+                problemPopup.classed('disabled', true);
+                if(data.tag == "na") {
+                    naInfoBtn
+                        .classed('disabled', false)
+                        .style('left', data.position[0] + mapPointOffset + 'px')
+                        .style('top', data.position[1] + mapPointOffset + 'px')
+                        .on('click', function() {
+                            problemPopup.classed('disabled', false)
+                                .selectAll('.list .line')
+                                .classed('disabled', true);
+                            var problem = curPointData.problem;
+                            problemPopup.select('.title').text(problem.title);
+
+                            if(problem.metropolis) {
+                                var metropolisInfo = _.findWhere(allData, {id:problem.metropolis});
+                                problemPopup.select('.metropolis')
+                                    .classed('disabled', false)
+                                    .select('.val')
+                                    .text(metropolisInfo.title);
+                            }
+
+                            if(problem.when) {
+                                problemPopup.select('.year')
+                                    .classed('disabled', false)
+                                    .select('.val')
+                                    .text(problem.when + ' год');
+                            }
+
+                            if(problem.square) {
+                                problemPopup.select('.square')
+                                    .classed('disabled', false)
+                                    .select('.val')
+                                    .text(problem.square + " км");
+                            }
+
+                            if(problem.population) {
+                                problemPopup.select('.populas')
+                                    .classed('disabled', false)
+                                    .select('.val')
+                                    .text(problem.population + " тыс. чел.");
+                            }
+
+
+                            problemPopup.select('.percents .people .inside-rect')
+                                .style('width', 0)
+                                .style('height', 0)
+                                .interrupt()
+                                .transition()
+                                .style('width', 50 * problem.populationPercent + 'px')
+                                .style('height', 50 * problem.populationPercent + 'px');
+
+                            problemPopup.select('.percents .people .val')
+                                .text(0)
+                                .interrupt()
+                                .transition()
+                                .text(parseInt(problem.populationPercent * 100));
+
+
+                            problemPopup.select('.percents .square .inside-rect')
+                                .style('width', 0)
+                                .style('height', 0)
+                                .interrupt()
+                                .transition()
+                                .style('width', 50 * problem.squarePercent + 'px')
+                                .style('height', 50 * problem.squarePercent + 'px');
+
+                            problemPopup.select('.percents .square .val')
+                                .text(parseInt(problem.squarePercent * 100));
+
+                            if(problem.desc) {
+                                problemPopup.select('.about')
+                                    .text(g3.carryUnionsHTML2(problem.desc))
+                                    .classed('disabled', false);
+                            } else {
+                                problemPopup.select('.about')
+                                    .classed('disabled', true);
+                            }
+                        });
+                } else {
+                    naInfoBtn.on('click', null).classed('disabled', true);
+                }
+            }).on('mouseover', function(data) {
+                var mousePos = d3.mouse(this);
+                infoPopup.text(data.title)
+                    .style('left', mousePos[0] + infoPopupOffset + 'px')
+                    .style('top', mousePos[1] + infoPopupOffset + 'px')
+                    .classed('disabled', false);
+            }).on('mouseout', function() {
+               infoPopup.classed('disabled', true);
+            });
+            //drawBorderLines();
+            //hideBorderLines();
         });
-        balanceLinks(data);
-        invertLinks(data);
-
-        console.log(allData);
-        borderList = formatBorderList(data);
-        tagData = d3.nest()
-            .key(function(d){ return d.tag;})
-            .entries(data);
-
-        mapPoints.on('click', function() {
-            curPoint = d3.select(this);
-            drawApproveLines.call(curPoint, curFilter.prop);
-            drawFilters.call(this);
-        });
-        drawBorderLines();
-        //hideBorderLines();
     });
 
     addFilters();

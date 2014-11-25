@@ -5,12 +5,22 @@ text-c = #FFF
 text-c2 = #6D6E70
 mc = #1D272A
 mc2 = #2E393C
-nac = #FFC519
-unna = #F3740D
+unna = #FFC519
+na = #F3740D
 un = #A1A4A7
+
+
+bgpopup = rgba(mc, .8)
+
+body
+  font-family PTSansCaption
+  font-size: 12px
+  color white
 
 *
   user-select none
+.disabled
+  display: none
 #ig
   position: absolute
   left: 0
@@ -40,17 +50,145 @@ un = #A1A4A7
     position absolute
     left: 0
     top: 0
-    .ig-logo
+    .popup
+      padding: 5px
+      background-color: bgpopup
       position: absolute
-      font-family PTSans
-      color #949494
-      font-size 10px
+      left: 0
+      top: 0
+    .problem-popup
+      width: 300px
+      padding: 20px
+      background-color: bgpopup
+      position: absolute
+      left: 760px;
+      top: 170px;
+      >.desc
+        font-family PTSans
+        margin-top: 30px
+      .info
+        font-size 10px
+        color white
+        text-transform: uppercase
+        .percents
+          >div
+            width: 50%
+            display: inline-block
+            vertical-align top
+            .wrapper
+              .val
+              .percent-sign
+                display: inline
+                color unna
+                font-weight: bold
+              .val
+                font-size: 39px
+                line-height: 29px;
+              .percent-sign
+                font-size: 20px
+                line-height: 10px;
+              .rect
+                width: 50px
+                height: 50px
+                background-color: #3A4346
+                margin-right: 10px
+                display: inline-block
+                .inside-rect
+                  position: absolute
+                  bottom: 0
+                  right: 0
+                  width: 10px
+                  height: 10px
+                  background-color: unna
+              >div
+                vertical-align bottom
+            .title
+              padding-right: 10px
+              margin-bottom: 10px
+        >.title
+          font-size 14px
+          margin-bottom: 10px
+          font-weight: bold
+        .list
+          margin-bottom: 30px
+          .line
+            border-bottom: 1px solid white
+            &:last-child
+              border none
+            >div
+              padding-right: 10px
+              width: 50%
+              line-height: 14px
+              display: inline-block
+              vertical-align top
+    .na-info.btn
+      position: absolute
+      left: 100px
+      top: 100px
+      .block
+        s = 14px
+        width: s
+        height: s
+        margin-left: -(s/2)
+        margin-top: -(s/2)
+        background-color: unna
+        color black
+        text-align: center
+        line-height: s
+        position: absolute
+        border-radius: 50%
+        font-size: 10px
+        font-weight: bold
+    .footer
+      bottom: 0
+      left: 0
+      width: 1280px;
+      position: absolute
+      .ig-logo
+        position: absolute
+        font-family PTSans
+        color #949494
+        font-size 10px
+        left: 20px
+        bottom: 20px
+      .lenta-logo
+        position: absolute
+        right: 20px
+        bottom: 15px
+    .legend
+      position: absolute
+      top: 500px;
       left: 20px
-      bottom: 20px
-    .lenta-logo
-      position: absolute
-      right: 20px
-      bottom: 15px
+      width: 270px
+      color #77797F
+      .title
+        font-size: 14px
+        color white
+        font-weight: bold
+        text-transform: uppercase
+        margin-bottom: 10px
+      >.desc
+        margin-bottom: 10px
+      .line
+        display: inline
+        margin-left: 5px
+        &:first-child
+          margin-left: 0
+        >div
+          vertical-align: middle
+        .rect
+          display: inline-block
+          width: 5px
+          height: 5px
+          background-color: red
+          &.un
+            background-color: un
+          &.unna
+            background-color: unna
+          &.na
+            background-color: na
+        .desc
+          display: inline
     .map
       width: 100%
       height: 100%
@@ -66,7 +204,6 @@ un = #A1A4A7
             fill none
           text
             fill #E7E7E7
-            font-family PTSansCaption
             font-size 10px
             text-transform uppercase
           .inner-circle
@@ -80,7 +217,7 @@ un = #A1A4A7
         cursor pointer
       .approve-line
         stroke-width 1px
-        stroke nac
+        stroke unna
         opacity: .4
       .border-line
         stroke-width 1px
