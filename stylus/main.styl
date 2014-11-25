@@ -60,71 +60,82 @@ body
       left: 0
       top: 0
     .problem-popup
-      width: 300px
-      padding: 20px
-      background-color: bgpopup
       position: absolute
-      left: 760px;
-      top: 170px;
-      >.desc
-        font-family PTSans
-        margin-top: 30px
-      .info
-        font-size 10px
-        color white
-        text-transform: uppercase
-        .percents
-          >div
-            width: 50%
-            display: inline-block
-            vertical-align top
-            .wrapper
-              .val
-              .percent-sign
-                display: inline
-                color unna
-                font-weight: bold
-              .val
-                font-size: 39px
-                line-height: 29px;
-                font-family RoboBold
-              .percent-sign
-                font-size: 20px
-                line-height: 10px;
-              .rect
-                width: 50px
-                height: 50px
-                background-color: #3A4346
-                margin-right: 10px
-                display: inline-block
-                .inside-rect
-                  position: absolute
-                  bottom: 0
-                  right: 0
-                  width: 10px
-                  height: 10px
-                  background-color: unna
-              >div
-                vertical-align bottom
-            .title
-              padding-right: 10px
-              margin-bottom: 10px
-        >.title
-          font-size 14px
-          margin-bottom: 10px
-          font-weight: bold
-        .list
-          margin-bottom: 30px
-          .line
-            border-bottom: 1px solid white
-            &:last-child
-              border none
+      left: 0
+      top: 110px
+      background-color: bgpopup
+      width: 100%
+      height: 610px
+      .map
+        position: absolute
+        display: block
+        left: 340px;
+        top: 40px;
+      .about-popup
+        width: 300px
+        padding: 20px
+        position: absolute
+        left: 760px;
+        top: 20px;
+        >.desc
+          font-family PTSans
+          margin-top: 30px
+        .info
+          font-size 10px
+          color white
+          text-transform: uppercase
+          .percents
             >div
-              padding-right: 10px
               width: 50%
-              line-height: 14px
               display: inline-block
               vertical-align top
+              .wrapper
+                .val
+                .percent-sign
+                  display: inline
+                  color unna
+                  font-weight: bold
+                .val
+                  font-size: 39px
+                  line-height: 29px;
+                  font-family RoboBold
+                .percent-sign
+                  font-size: 20px
+                  line-height: 10px;
+                .rect
+                  width: 50px
+                  height: 50px
+                  background-color: #3A4346
+                  margin-right: 10px
+                  display: inline-block
+                  .inside-rect
+                    position: absolute
+                    bottom: 0
+                    right: 0
+                    width: 10px
+                    height: 10px
+                    background-color: unna
+                >div
+                  vertical-align bottom
+              .title
+                padding-right: 10px
+                margin-bottom: 10px
+          >.title
+            font-size 14px
+            margin-bottom: 10px
+            font-weight: bold
+          .list
+            margin-bottom: 30px
+            .line
+              border-bottom: 1px solid white
+              &:last-child
+                border none
+              >div
+                padding-right: 10px
+                width: 50%
+                line-height: 14px
+                display: inline-block
+                vertical-align top
     .na-info.btn
       position: absolute
       left: 100px
@@ -136,7 +147,7 @@ body
         margin-left: -(s/2)
         margin-top: -(s/2)
         background-color: unna
-        color text-c2
+        color mc2
         text-align: center
         line-height: s
         position: absolute
@@ -193,7 +204,7 @@ body
             background-color: na
         .desc
           display: inline
-    .map
+    >.map
       width: 100%
       height: 100%
       background-color: #1d272a;
@@ -212,11 +223,13 @@ body
             text-transform uppercase
           .inner-circle
             opacity 0
-            fill text-c2
+            fill mc2
             transition opacity .3s
           &.selected
+            .border-point
+              stroke mc2
             text
-              fill text-c2
+              fill mc2
             rect
               fill unna
             .inner-circle
