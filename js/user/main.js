@@ -2,6 +2,7 @@
     //example
     g3.initContent({contentWidth:1280, contentHeight:720, domain:"lenta.ru", debugMode:true});
 
+    var staticMapPath = 'img/maps/'
     var mapPointColors = {un:'#A1A4A7', unna:'#FFC519', na:'#F3740D'};
     var allData = null, tagData = null, borderList = null;
     var bordersLayer = d3.select('#borders'), mapPoints = d3.selectAll('#rects rect'),
@@ -29,6 +30,7 @@
 
         d3.tsv('problems.csv', function(problemData) {
             //format data
+            console.log(problemData);
             _.each(allData, function(d) {
                 d.mapPoint = d3.select('#' + d.id);
                 d.mapPoint.datum(d).style('fill', mapPointColors[d.tag.toLowerCase()]);
@@ -67,12 +69,12 @@
                 if(problem.metropolisSquare) {
                     problem.squarePercent = problem.square / problem.metropolisSquare;
                 } else {
-                    problem.squarePercent = 0;
+                    problem.squarePercent = null;
                 }
                 if(problem.metropolisPopulation) {
                     problem.populationPercent = problem.population / problem.metropolisPopulation;
                 } else {
-                    problem.populationPercent = 0;
+                    problem.populationPercent = null;
                 }
                 var node = _.findWhere(allData, {id:problem.id});
                 if(node) {
@@ -159,32 +161,45 @@
                             .text(problem.population + " тыс. чел.");
                     }
 
+                    function getPercent(percent) {
+                        return percent < 1 ? '<1' : percent;
+                    }
 
-                    problemPopup.select('.percents .people .inside-rect')
-                        .style('width', 0)
-                        .style('height', 0)
-                        .interrupt()
-                        .transition()
-                        .style('width', 50 * problem.populationPercent + 'px')
-                        .style('height', 50 * problem.populationPercent + 'px');
+                    if(problem.populationPercent != null) {
+                        problemPopup.select('.percents .people').classed('disabled', false);
+                        problemPopup.select('.percents .people .inside-rect')
+                            .style('width', 0)
+                            .style('height', 0)
+                            .interrupt()
+                            .transition()
+                            .style('width', 50 * problem.populationPercent + 'px')
+                            .style('height', 50 * problem.populationPercent + 'px');
 
-                    problemPopup.select('.percents .people .val')
-                        .text(0)
-                        .interrupt()
-                        .transition()
-                        .text(parseInt(problem.populationPercent * 100));
+                        problemPopup.select('.percents .people .val')
+                            .text(0)
+                            .interrupt()
+                            .transition()
+                            .text(getPercent(parseInt(Math.floor(problem.populationPercent * 100))));
+                    } else {
+                        problemPopup.select('.percents .people').classed('disabled', true);
+                    }
+
+                    if(problem.populationPercent != null) {
+                        problemPopup.select('.percents .square').classed('disabled', false);
+                        problemPopup.select('.percents .square .inside-rect')
+                            .style('width', 0)
+                            .style('height', 0)
+                            .interrupt()
+                            .transition()
+                            .style('width', 50 * problem.squarePercent + 'px')
+                            .style('height', 50 * problem.squarePercent + 'px');
 
 
-                    problemPopup.select('.percents .square .inside-rect')
-                        .style('width', 0)
-                        .style('height', 0)
-                        .interrupt()
-                        .transition()
-                        .style('width', 50 * problem.squarePercent + 'px')
-                        .style('height', 50 * problem.squarePercent + 'px');
-
-                    problemPopup.select('.percents .square .val')
-                        .text(parseInt(problem.squarePercent * 100));
+                        problemPopup.select('.percents .square .val')
+                            .text(getPercent(parseInt(Math.floor(problem.squarePercent * 100))));
+                    } else {
+                        problemPopup.select('.percents .square').classed('disabled', true);
+                    }
 
                     if(problem.desc) {
                         problemPopup.select('.about')
@@ -193,6 +208,14 @@
                     } else {
                         problemPopup.select('.about')
                             .classed('disabled', true);
+                    }
+
+                    var map = problemPopup.select('.map');
+                    console.log(problem);
+                    if(problem.pic) {
+                        map.attr('src', staticMapPath + problem.pic);
+                    } else {
+                        map.attr('src', '');
                     }
                 });
         } else {
