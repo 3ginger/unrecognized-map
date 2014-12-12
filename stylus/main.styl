@@ -77,8 +77,24 @@ body
         position: absolute
         left: 760px;
         top: 20px;
-        >.desc
+        >.pager
+          margin: 20px auto
+          .page
+            s = 12px
+            width: s
+            height s
+            background-color: #3A4346
+            margin-right: s
+            display inline-block
+            transition all .3s
+            &:last-child
+              margin-right: 0
+            &.selected
+            &:hover
+              background-color: #FFFFFF
+        >.about
           font-family PTSans
+        .disabled.pager + .about
           margin-top: 30px
         .info
           font-size 10px

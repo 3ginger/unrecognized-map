@@ -30,7 +30,7 @@
 
         d3.tsv('problems.csv', function(problemData) {
             //format data
-            console.log(problemData);
+            console.log(problemData.desc);
             _.each(allData, function(d) {
                 d.mapPoint = d3.select('#' + d.id);
                 d.mapPoint.datum(d).style('fill', mapPointColors[d.tag.toLowerCase()]);
@@ -62,6 +62,7 @@
 
 
             _.each(problemData, function(problem) {
+                problem.desc = problem.desc.split('///');
                 problem.square = +problem.square;
                 problem.metropolisSquare = +problem.metropolisSquare;
                 problem.population = +problem.population;
@@ -202,9 +203,43 @@
                     }
 
                     if(problem.desc) {
-                        problemPopup.select('.about')
-                            .text(g3.carryUnionsHTML2(problem.desc))
+                        function clickOnPage(i) {
+                            problemPopup.selectAll('.pager .page')
+                                .classed('selected', false);
+                            var d3this = d3.select(this).classed('selected', true);
+
+                            console.log(i);
+                            d3.select(problemPopup.selectAll('.about .desc')
+                                .classed('disabled', true)[0][i])
+                                .classed('disabled', false);
+
+                            d3.event.stopPropagation();
+                        }
+                        problemPopup.select('.about').html('')
+                            .classed('disabled', false)
+                            .selectAll('.desc')
+                            .data(problem.desc).enter()
+                            .append('div')
+                            .attr('class', 'desc')
+                            .text(function(d) { return g3.carryUnionsHTML2(d);})
                             .classed('disabled', false);
+
+
+                        if(problem.desc.length > 1) {
+                            problemPopup.select('.pager').html('')
+                                .classed('disabled', false)
+                                .style('width', (problem.desc.length*12*2 - 12) + 'px')
+                                .selectAll('.page')
+                                .data(problem.desc).enter()
+                                .append('div')
+                                .attr('class', 'page btn')
+                                .classed('selected', false).on('click', function(d, i) {
+                                    clickOnPage.call(this, i);
+                                });
+                            clickOnPage.call(problemPopup.selectAll('.pager .page')[0][0], 0);
+                        } else {
+                            problemPopup.select('.pager').classed('disabled', true);
+                        }
                     } else {
                         problemPopup.select('.about')
                             .classed('disabled', true);

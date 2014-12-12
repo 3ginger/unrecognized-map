@@ -23,3 +23,22 @@
 
 - доверстать легенду текстами
 - внести правки в тексты про непризнанные страны
+
+
+if(problem.desc) {
+                        problemPopup.select('.about')
+                            .classed('disabled', false)
+                            .selectAll('.desc')
+                            .data(problem.desc).enter()
+                            .append('div')
+                            .attr('class', 'desc')
+                            .text(function(d) { return g3.carryUnionsHTML2(d);})
+                            .classed('disabled', false);
+                    } else {
+                        problemPopup.select('.about')
+                            .classed('disabled', true);
+                    }
+
+
+
+                    problem.desc = problem.desc.split('///');
