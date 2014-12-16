@@ -2,7 +2,7 @@
     //example
     g3.initContent({contentWidth:1280, contentHeight:720, domain:"lenta.ru", debugMode:true});
 
-    var staticMapPath = 'img/maps/'
+    var staticMapPath = 'img/maps/';
     var mapPointColors = {un:'#A1A4A7', unna:'#FFC519', na:'#F3740D'};
     var allData = null, tagData = null, borderList = null;
     var bordersLayer = d3.select('#borders'), mapPoints = d3.selectAll('#rects rect'),
@@ -22,6 +22,9 @@
     var problemPopup = d3.select('.problem-popup'), infoPopup = d3.select('.popup'), naInfoBtn = d3.select('.na-info.btn');
     var infoPopupOffset = 10;
 
+    var reboundRadius = 30;
+    var nearestCountries, rafID, numFrames, maxFrames = 30;
+
     problemPopup.on('click', function() {
         problemPopup.classed('disabled', true);
     });
@@ -30,7 +33,6 @@
 
         d3.tsv('problems.csv', function(problemData) {
             //format data
-            console.log(problemData.desc);
             _.each(allData, function(d) {
                 d.mapPoint = d3.select('#' + d.id);
                 d.mapPoint.datum(d).style('fill', mapPointColors[d.tag.toLowerCase()]);
@@ -84,15 +86,58 @@
                     console.log('problem id = ', problem.id);
                 }
             });
-            console.log(allData);
             borderList = formatBorderList(allData);
             tagData = d3.nest()
                 .key(function(d){ return d.tag;})
                 .entries(allData);
 
+
             mapPoints.on('click', function(data) {
+                console.log(data);
+                _.each(nearestCountries, function(country) {
+                    country.mapPoint.interrupt().transition().duration(200 + Math.random()*100).attr('x', country.position[0]).attr('y', country.position[1]);
+                });
+                function getSquare(x) {
+                    return x*x;
+                }
+                nearestCountries = _.filter(allData, function(country) {
+                    if(country != data) {
+                        var distance = Math.sqrt(getSquare(data.position[0] - country.position[0]) + getSquare(data.position[1] - country.position[1]));
+                        if(distance < reboundRadius) {
+                            country.reboundK = reboundRadius/distance;
+                            country.curDistance = distance;
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+                _.each(nearestCountries, function(country) {
+                    var deltaX = country.position[0] - data.position[0];
+                    var deltaY = country.position[1] - data.position[1];
+
+                    var reboundPosition = [data.position[0] + deltaX*country.reboundK, data.position[1] + deltaY*country.reboundK];
+                    country.mapPoint.interrupt().transition().duration(200 + Math.random()*100).attr('x', reboundPosition[0]).attr('y', reboundPosition[1]);
+                });
+
                 curPoint = d3.select(this);
-                drawApproveLines.call(curPoint, curFilter.prop);
+
+                if(rafID) window.cancelAnimationFrame(rafID);
+                function rafAnimate() {
+                    numFrames++;
+                    drawBorderLines();
+                    drawApproveLines.call(curPoint, curFilter.prop);
+                    if(numFrames < maxFrames) {
+                        setTimeout(function() {
+                            rafAnimate();
+                        }, 1000/60)
+                    }
+
+                }
+                rafID = window.requestAnimationFrame(function() {
+                    numFrames = 0;
+                    rafAnimate();
+                });
+
                 drawFilters.call(this);
 
                 viewProblemPopup(data);
@@ -108,10 +153,14 @@
             drawBorderLines();
             //hideBorderLines();
         });
+        _.filter(allData, function(dd) {
+            if(dd.tag == 'na' && !dd.problem ) {
+                console.log('na country dont\'t have problem set', dd.title);
+            }
+        });
     });
 
     addFilters();
-    console.log(filtersInfo);
     setFilter.call(filtersInfo[0].header);
     function setFilter() {
         d3.selectAll('.filter .header').classed('selected', false);
@@ -208,7 +257,6 @@
                                 .classed('selected', false);
                             var d3this = d3.select(this).classed('selected', true);
 
-                            console.log(i);
                             d3.select(problemPopup.selectAll('.about .desc')
                                 .classed('disabled', true)[0][i])
                                 .classed('disabled', false);
@@ -246,7 +294,6 @@
                     }
 
                     var map = problemPopup.select('.map');
-                    console.log(problem);
                     if(problem.pic) {
                         map.attr('src', staticMapPath + problem.pic);
                     } else {
@@ -308,7 +355,6 @@
         filterPoints.each(function(d, i) {
             var taggedList = d3.nest().key(function(d){ return d.tag;}).entries(data[d.prop]);
             var list = [];
-            console.log(taggedList);
             for (var j = 0; j < taggedList.length; j++) {
                 list = list.concat(taggedList[j].values);
             }
@@ -324,6 +370,7 @@
                 .attr('height', mapPointSize)
                 .attr('fill', function(d) {return mapPointColors[d.tag]})
                 .on('click', function(d) {
+                    console.log(111);
                     curPoint = d.mapPoint;
                     drawFilters.call(this);
                     drawApproveLines.call(curPoint, curFilter.prop);
@@ -441,20 +488,20 @@
             .append('line')
             .attr('class', 'approve-line')
             .attr('x1', data.position[0] + mapPointOffset)
-            .attr('x2', function(d) {return d.position[0] + mapPointOffset;})
+            .attr('x2', function(d) {return parseInt(d.mapPoint.attr('x')) + mapPointOffset;})
             .attr('y1', data.position[1] + mapPointOffset)
-            .attr('y2', function(d) {return d.position[1] + mapPointOffset;});
+            .attr('y2', function(d) {return parseInt(d.mapPoint.attr('y')) + mapPointOffset;});
     }
 
     function drawBorderLines() {
-        bordersLayer.selectAll('line')
+        bordersLayer.html('').selectAll('line')
             .data(borderList).enter()
             .append('line')
             .attr('class', 'border-line')
-            .attr('x1', function(d) {return d[0].position[0] + mapPointOffset;})
-            .attr('x2', function(d) {return d[1].position[0] + mapPointOffset;})
-            .attr('y1', function(d) {return d[0].position[1] + mapPointOffset;})
-            .attr('y2', function(d) {return d[1].position[1] + mapPointOffset;});
+            .attr('x1', function(d) {return parseInt(d[0].mapPoint.attr('x')) + mapPointOffset;})
+            .attr('x2', function(d) {return parseInt(d[1].mapPoint.attr('x')) + mapPointOffset;})
+            .attr('y1', function(d) {return parseInt(d[0].mapPoint.attr('y')) + mapPointOffset;})
+            .attr('y2', function(d) {return parseInt(d[1].mapPoint.attr('y')) + mapPointOffset;});
     }
 
     function showBorderLines() {

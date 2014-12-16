@@ -65,7 +65,7 @@ IE	Ирландия	UN	GB
 IS	Исландия	UN
 ES	Испания	UN	PT, MA, FR, AD
 IT	Италия	UN	FR, CH, AT, SI, SM, VA
-YE	Йемен	UN	OM, SA, ABY, ESH
+YE	Йемен	UN	OM, SA, ABY
 CV	Кабо-Верде	UN
 KZ	Казахстан	UN	RU, CN, KG, UZ, TM
 KH	Камбоджа	UN	VN, LA, TH
@@ -76,7 +76,7 @@ KE	Кения	UN	ET, SO, TZ, UG, SS
 CY	Кипр	UNNA			TR
 KG	Киргизия	UN	KZ, UZ, TJ, CN
 KI	Кирибати	UN
-CN	КНР	UNNA	KP, RU, MN, KZ, KG, TJ, AF, PK, IN, NP, BT, MM, LA, VN		BZ, BF, VA, HT, GT, HN, DO, KI, MH, NR, NI, PW, PA, PY, SV, ST, SZ, VC, KN, LC, SB, TV
+CN	КНР	UNNA	KP, RU, MN, KZ, KG, TJ, AF, PK, IN, NP, BT, MM, LA, VN		BZ, BF, VA, HT, GT, HN, DO, KI, MH, NR, NI, PW, PA, PY, SV, ST, SZ, VC, KN, LC, SB, TV, MOR
 CO	Колумбия	UN	BR, VE, EC, PE, PA
 KM	Коморы	UN
 CR	Коста-Рика	UN	NI, PA
@@ -148,7 +148,7 @@ KN	Сент-Китс и Невис	UN
 LC	Сент-Люсия	UN
 RS	Сербия	UN	RO, BG, MK, ME, AL, BA, HR, HU
 SG	Сингапур	UN	MY
-SY	Сирия	UNNA	LB, IL, JO, IQ, TR
+SY	Сирия	UN	LB, IL, JO, IQ, TR
 SK	Словакия	UN	UA, PL, CZ, AT, HU
 SI	Словения	UN	IT, AT, HU, HR
 SB	Соломоновы острова	UN
@@ -202,23 +202,21 @@ SOS	Южная Осетия	NA	RU, GE	RU, NI, VE, NR, ABH, NKR, PMR, SADR, DNR, 
 KHA	Халистан	NA	IN, PK	PK, TR, TRNC
 CRT	Китайская Республика (о. Тайвань)	UNNA		BZ, BF, VA, HT, GT, HN, DO, KI, MH, NR, NI, PW, PA, PY, SV, ST, SZ, VC, KN, LC, SB, TV
 SADR	Сахарская Арабская Демократическая Республика	NA	MA, DZ, MR, ML	DZ, AO, BZ, BO, BW, VU, VE, TL, VN, GY, GH, HN, ZM, ZW, IR, YE, CV, KE, KP, CU, LA, LS, LR, LY, MR, MW, ML, MX, MZ, NA, NG, NI, PG, RW, SV, SY, SR, SL, TZ, TT, UG, UY, EC, ET, ZA, SS, JM, TV
-MOR	Мальтийский Орден	NA	IT	CN, IT
+MOR	Мальтийский Орден	NA	IT	IT
 PMR	Приднестровская Молдавская Республика	NA	MD, UA	ABH, SOS, NKR
 NKR	Нагорно-Карабахская Республика	NA	AM, AZ, IR	ABH, SOS, PMR
 SML	Сомалиленд	NA	DJB, ET, PNT
 PNT	Пунтленд	NA	SML, GLM, ET
-DJB	Джубаленд	NA	AZA, JAM,HIH
+DJB	Джубаленд	NA	AZA, HIH
 GLM	Галмудуг	NA	HIH, PNT
-HIH	Химан и Хеб	NA	GLM, DJB, JAM
+HIH	Химан и Хеб	NA	GLM, DJB
 AVD	Авдаленд	NA	SML
-JAM	Джамаат Аш-Шабааб	NA	AZA, DJB, HIH
-VAS	Государство Ва	NA	MM, SHA
-SHA	Государство Шан	NA	MM, VAS
-ABY	Эмират Абьян	NA	ESH, YE
-ESH	Эмират Шавба	NA	ABY, YE
+VAS	государство Ва	NA	MM, SHA
+SHA	государство Шан	NA	MM, VAS
+ABY	Эмират Абьян	NA	YE
 VAZ	Вазиристан	NA	AF, PK
-BAK	ДР Бакасси	NA
-AZA	Азавад	NA	DJB, JAM
+BAK	Демократическую Республику Бакасси	NA	NG, CM
+AZA	Азавад	NA	DJB
 SUL	Султанат Сулу	NA	MY, ID, PH
 NAG	Народная республика Нагалим	NA	IN
 SIL	Силенд	NA
@@ -230,3 +228,4 @@ DNR	Донецкая Народная Республика	NA	UA, RU, LNR	SOS, L
 LNR	Луганская Народная Республика	NA	UA, RU, DNR	SOS, DNR
 KOS	Косово	NA	RS	AF, CR, AL, FR, TR, US, GB, AU, SN, LV, DE, EE, IT, DK, LU, PE, BE, PL, CH, AT, IE, SE, NL, IS, SI, FI, JP, CA, MC, HU, HR, BG, LI, KP, NO, MH, NR, BF, LT, SM, CZ, LR, SL, CO, BZ, MT, WS, PT, ME, MK, AE, MY, PA, MV, PW, GM, SA, KM, BH, JO, DO, NZ, MW, MR, SZ, VU, DJ, SO, HN, KI, QA, GW, OM, AD, CF, GN, NE, BJ, LC, GA, CI,  KW, GH, HT, ST, BN, TD, PG, BI, TL, KN, FJ, DM, PK, GY, TZ, YE, EG, SV, GD, LY, TH, TO, LS, TG, CRT, MOR, TRNC
 PAL	Палестина	UNNA	JO, EG, IL	DZ, BH, ID, IQ, YE, LY, KW, MR, MY, MA, SO, TN, TR, AF, BD, ZM, JO, QA, CU, MG, MT, NI, AE, PK, SA, RS, AL, BN, DJ, MU, SD, EG, IN, CY, NG, SK, CZ, LK, BY, VN, GN, NA, RU, UA, CN, BF, GW, KH, ML, MN, SN, HU, CV, KP, NE, RO, TZ, BG, ZW, MV, GH, AZ
+KAS	Азад Кашмир	NA	AF, CN, IN, PK	PK
