@@ -15,8 +15,8 @@
         {title:"Кого признаёт", prop:"approvedList"},
         {title:"Кого не признаёт", prop:"negativedList"}
     ], filterPointOffset = 2, numPointsInLine = 20,
-        filterWidth = (mapPointSize + filterPointOffset)*numPointsInLine - filterPointOffset,
-        filterOffset = 30, filterPosition = [1280 - filtersInfo.length * (filterWidth + filterOffset) + 40 - filterOffset, 20];
+        filterWidth = (mapPointSize + filterPointOffset)*numPointsInLine - filterPointOffset, filterHeight = 30,
+        filterOffset = 30, filterPosition = [1280 - filtersInfo.length * (filterWidth + filterOffset) + 40 - filterOffset - filterHeight - filterOffset, 20];
 
     var curPoint = null, curFilter = null;
     var problemPopup = d3.select('.problem-popup'), infoPopup = d3.select('.popup'), naInfoBtn = d3.select('.na-info.btn');
@@ -24,6 +24,18 @@
 
     var reboundRadius = 30;
     var nearestCountries, rafID, numFrames, maxFrames = 30;
+
+
+    var aboutMethodsPopup = d3.select('.about-methods');
+
+
+    d3.select('.about-methods-btn').on('click', function() {
+        aboutMethodsPopup.classed('disabled', !aboutMethodsPopup.classed('disabled'));
+    });
+
+    aboutMethodsPopup.on('click', function() {
+        aboutMethodsPopup.classed('disabled', true);
+    });
 
     problemPopup.on('click', function() {
         problemPopup.classed('disabled', true);
@@ -311,7 +323,6 @@
             .attr('class', 'filter')
             .attr('transform', function(d, i) {return 'translate(' + (filterPosition[0] + (filterWidth + filterOffset) * i) + ',' + filterPosition[1] + ')' ;});
 
-
         var headers = filters.append('g')
             .attr('class', 'header')
             .each(function(d) {
@@ -325,14 +336,14 @@
             });
         headers.append('rect')
             .attr('width', filterWidth)
-            .attr('height', 20);
+            .attr('height', filterHeight);
 
         headers.append('text')
-            .attr('x', 30)
-            .attr('y', 14)
+            .attr('x', 10)
+            .attr('y', 19)
             .text(function(d) {return d.title;});
 
-        var circleOffset = 10;
+        /*var circleOffset = 10;
         headers.append('circle')
             .attr('class', 'border-point')
             .attr('cx', circleOffset)
@@ -343,11 +354,11 @@
             .attr('class', 'inner-circle')
             .attr('cx', circleOffset)
             .attr('cy', circleOffset)
-            .attr('r', 3);
+            .attr('r', 3);*/
 
         filterPoints = filters.append('g')
             .attr('class', 'points')
-            .attr('transform', 'translate(0,' + (20 + filterPointOffset) + ')');
+            .attr('transform', 'translate(0,' + (filterHeight + filterPointOffset) + ')');
     }
 
     function drawFilters() {
