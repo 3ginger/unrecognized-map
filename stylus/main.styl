@@ -12,6 +12,7 @@ un = #A1A4A7
 
 bgpopup = rgba(mc, .8)
 
+
 body
   font-family PTSansCaption
   font-size: 12px
@@ -29,6 +30,38 @@ body
   left: 0
   top: 0
   color text-c
+  .country-list
+    position: absolute
+    left: 20px
+    top: 20px
+    width: 300px
+    .list
+      background-color: mc2
+      .line
+        padding: 5px 10px
+        cursor pointer
+        &.unna
+          color unna
+        &.na
+          color na
+        &.un
+          color un
+        &:hover
+          background-color: unna
+          color text-c
+    .text
+      width: 100%
+      padding: 10px
+      height: 31px
+      background-color: text-c2
+      color white
+      border none
+      cursor url(../img/search.png), auto
+      &:focus
+        outline: none !important;
+        border:1px solid unna;
+        background-color: #ffffff
+        color text-c2
   .social-btns
     position absolute
     bottom 20px
@@ -231,6 +264,9 @@ body
         position: absolute
         right: 20px
         bottom: 15px
+        img
+          width: 100px;
+          bottom: -25px;
     .legend
       position: absolute
       top: 500px;
@@ -238,7 +274,7 @@ body
       width: 270px
       color #77797F
       .title
-        font-size: 14px
+        font-size: 20px
         color white
         font-weight: bold
         text-transform: uppercase

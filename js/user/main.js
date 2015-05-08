@@ -40,6 +40,8 @@
     problemPopup.on('click', function() {
         problemPopup.classed('disabled', true);
     });
+
+    var countryList = d3.select('.country-list'), countryListText = countryList.select(".text");
     d3.tsv('data.csv', function(data) {
         allData = data;
 
@@ -104,56 +106,26 @@
                 .entries(allData);
 
 
-            mapPoints.on('click', function(data) {
-                console.log(data);
-                _.each(nearestCountries, function(country) {
-                    country.mapPoint.interrupt().transition().duration(200 + Math.random()*100).attr('x', country.position[0]).attr('y', country.position[1]);
-                });
-                function getSquare(x) {
-                    return x*x;
-                }
-                nearestCountries = _.filter(allData, function(country) {
-                    if(country != data) {
-                        var distance = Math.sqrt(getSquare(data.position[0] - country.position[0]) + getSquare(data.position[1] - country.position[1]));
-                        if(distance < reboundRadius) {
-                            country.reboundK = reboundRadius/distance;
-                            country.curDistance = distance;
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-                _.each(nearestCountries, function(country) {
-                    var deltaX = country.position[0] - data.position[0];
-                    var deltaY = country.position[1] - data.position[1];
-
-                    var reboundPosition = [data.position[0] + deltaX*country.reboundK, data.position[1] + deltaY*country.reboundK];
-                    country.mapPoint.interrupt().transition().duration(200 + Math.random()*100).attr('x', reboundPosition[0]).attr('y', reboundPosition[1]);
+            var linesCountry = countryList.select('.list').selectAll('.line')
+                .data(data).enter()
+                .append('div')
+                .attr('class', function(d) {return 'line disabled ' + d.tag;})
+                .text(function(d) {return d.title;})
+                .on('click', function(data){
+                    return onMapPointClick.call(data.mapPoint[0][0], data);
                 });
 
-                curPoint = d3.select(this);
+            d3.select('body').on('click', function(){linesCountry.classed('disabled', true)});
+            countryListText.on('click', function(){
+                this.value = "";
+            }).on('keyup', function(){
+                var searchLine = this.value.toLowerCase();
+                linesCountry.classed("disabled", function(d) {return d.title.toLowerCase().indexOf(searchLine) == -1;});
+            });
 
-                if(rafID) window.cancelAnimationFrame(rafID);
-                function rafAnimate() {
-                    numFrames++;
-                    drawBorderLines();
-                    drawApproveLines.call(curPoint, curFilter.prop);
-                    if(numFrames < maxFrames) {
-                        setTimeout(function() {
-                            rafAnimate();
-                        }, 1000/60)
-                    }
 
-                }
-                rafID = window.requestAnimationFrame(function() {
-                    numFrames = 0;
-                    rafAnimate();
-                });
-
-                drawFilters.call(this);
-
-                viewProblemPopup(data);
-            }).on('mouseover', function(data) {
+            console.log(data);
+            mapPoints.on('click', function(data) {onMapPointClick.call(this, data);}).on('mouseover', function(data) {
                 var mousePos = d3.mouse(this);
                 infoPopup.text(data.title)
                     .style('left', mousePos[0] + infoPopupOffset + 'px')
@@ -162,6 +134,9 @@
             }).on('mouseout', function() {
                infoPopup.classed('disabled', true);
             });
+
+
+
             drawBorderLines();
             //hideBorderLines();
         });
@@ -171,6 +146,57 @@
             }
         });
     });
+
+    function onMapPointClick(data) {
+        countryListText[0][0].value = data.title;
+        _.each(nearestCountries, function(country) {
+            country.mapPoint.interrupt().transition().duration(200 + Math.random()*100).attr('x', country.position[0]).attr('y', country.position[1]);
+        });
+        function getSquare(x) {
+            return x*x;
+        }
+        nearestCountries = _.filter(allData, function(country) {
+            if(country != data) {
+                var distance = Math.sqrt(getSquare(data.position[0] - country.position[0]) + getSquare(data.position[1] - country.position[1]));
+                if(distance < reboundRadius) {
+                    country.reboundK = reboundRadius/distance;
+                    country.curDistance = distance;
+                    return true;
+                }
+            }
+            return false;
+        });
+        _.each(nearestCountries, function(country) {
+            var deltaX = country.position[0] - data.position[0];
+            var deltaY = country.position[1] - data.position[1];
+
+            var reboundPosition = [data.position[0] + deltaX*country.reboundK, data.position[1] + deltaY*country.reboundK];
+            country.mapPoint.interrupt().transition().duration(200 + Math.random()*100).attr('x', reboundPosition[0]).attr('y', reboundPosition[1]);
+        });
+
+        curPoint = d3.select(this);
+
+        if(rafID) window.cancelAnimationFrame(rafID);
+        function rafAnimate() {
+            numFrames++;
+            drawBorderLines();
+            drawApproveLines.call(curPoint, curFilter.prop);
+            if(numFrames < maxFrames) {
+                setTimeout(function() {
+                    rafAnimate();
+                }, 1000/60)
+            }
+
+        }
+        rafID = window.requestAnimationFrame(function() {
+            numFrames = 0;
+            rafAnimate();
+        });
+
+        drawFilters.call(this);
+
+        viewProblemPopup(data);
+    }
 
     addFilters();
     setFilter.call(filtersInfo[0].header);
@@ -381,11 +407,12 @@
                 .attr('height', mapPointSize)
                 .attr('fill', function(d) {return mapPointColors[d.tag]})
                 .on('click', function(d) {
-                    console.log(111);
+                    onMapPointClick.call(d.mapPoint[0][0], d);
+                    /*console.log(111);
                     curPoint = d.mapPoint;
                     drawFilters.call(this);
                     drawApproveLines.call(curPoint, curFilter.prop);
-                    viewProblemPopup(d);
+                    viewProblemPopup(d);*/
                 }).on('mouseover', function(data) {
                     var mousePos = d3.mouse(d3.select('.content')[0][0]);
                     infoPopup.text(data.title)
