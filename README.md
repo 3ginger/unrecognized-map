@@ -1,3 +1,3 @@
-Непризнанные страны
+Unrecognized countries
 
-Инфографика для gazeta.ru
+Infographics for gazeta.ru
